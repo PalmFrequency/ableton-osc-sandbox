@@ -50,6 +50,31 @@ def _(client, mo, play_btn, stop_btn, tempo_slider):
 
 
 @app.cell
+def _(client, mo):
+    import socket
+    from pythonosc.osc_message import OscMessage
+
+    def query_ableton(address, params=None, listen_port=11001):
+        """Send an OSC query to port 11000 and return Ableton's reply from port 11001."""
+        if params is None:
+            params = []
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
+            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            sock.settimeout(1.5)
+            sock.bind(("127.0.0.1", listen_port))
+        
+            client.send_message(address, params)
+            data, _ = sock.recvfrom(65535)
+            return OscMessage(data).params
+
+    # Ask Ableton for the names of all tracks in your currently open Live Set
+    track_names = query_ableton("/live/song/get/track_names")
+
+    mo.md(f"**Tracks currently loaded in Ableton:** {', '.join(str(t) for t in track_names)}")
+    return
+
+
+@app.cell
 def _():
     return
 
