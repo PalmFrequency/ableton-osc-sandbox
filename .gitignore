@@ -1,0 +1,19 @@
+﻿# Virtual Environments
+.venv/
+venv/
+
+# Marimo & Python Cache
+__marimo__/
+__pycache__/
+*.py[cod]
+
+# PyCharm Local Workspace
+.idea/
+
+# Ableton Live Backups & Temp Files
+Backup/
+*.als~
+
+# OS Metadata
+.DS_Store
+Thumbs.db
