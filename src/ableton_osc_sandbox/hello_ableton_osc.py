@@ -37,7 +37,6 @@ ABLETON_IP = "127.0.0.1"
 ABLETON_PORT = 11000
 LOCAL_PORT = 11001
 
-ping_received = False
 connection_verified = False
 
 # =====================================================================
@@ -51,9 +50,10 @@ connection_verified = False
 # your listening port without needing to query a complex state.
 # =====================================================================
 def ping_handler(address, *args):
-    global ping_received
-    ping_received = True
-    print(f"\n[SUCCESS] Connected! Received response from Ableton: {address} -> {args}")
+    global connection_verified
+    connection_verified = True
+    print("\n[SUCCESS] Confirmed Connection to Ableton Live! (ping_handler)")
+    print(f"\n[SUCCESS] Connected! Received ping response from Ableton: {address} -> {args}")
 
 # =====================================================================
 # CALLBACK HANDLER
@@ -61,57 +61,73 @@ def ping_handler(address, *args):
 def tempo_handler(address, *args):
     global connection_verified
     connection_verified = True
-    print("\n[SUCCESS] Confirmed Connection to Ableton Live!")
+    print("\n[SUCCESS] Confirmed Connection to Ableton Live! (tempo_handler)")
     print(f"-> Current Project Tempo: {args[0]:.2f} BPM")
 
 # =====================================================================
 # CALLBACK HANDLER
-# callback function to listen for Ableton OSC responses
+# Callback function executed when Ableton replies with the volume.
+#
+# args[0] contains the float volume level (0.0 to 1.0)
 # =====================================================================
 def volume_handler(address, *args):
-    """Callback function executed when Ableton replies with the volume."""
-    # AbletonOSC returns volume as a float parameter (typically 0.0 to 1.0)
-    volume_level = args[0]
-    print(f"\n[Response] Master Volume Level: {volume_level:.2f}")
+    global connection_verified
+    connection_verified = True
+    print("\n[SUCCESS] Confirmed Connection to Ableton Live! (volume_handler)")
+    # AbletonOSC returns volume as a list  [track_num:int, volume_level:float] (typically 0.0 to 1.0)
+    volume_level = args[1]
+    print(f"\n[Response] Track 1 Volume Level: {volume_level:.2f}")
 
 # =====================================================================
 # Set up the local server to listen for Ableton's reply
+# and map paths with Dispatcher
 # =====================================================================
 disp = dispatcher.Dispatcher()
-#disp.map("/live/test/ping", ping_handler)
+disp.map("/live/test/ping", ping_handler)
 disp.map("/live/song/get/tempo", tempo_handler)
-#disp.map("/live/master/get/volume", volume_handler)
-
-# Catch-all handler to see if Ableton is sending *anything* else
-disp.set_default_handler(lambda addr, *args: print(f"[Traffic Alert] Received unmapped address: {addr} -> {args}"))
-
+disp.map("/live/track/get/volume", volume_handler)
+# Catch-all handler to see if Ableton is sending *anything* else (to unmapped path addresses)
+disp.set_default_handler(lambda addr, *args: print(f"\n[SUCCESS] Confirmed Connection to Ableton Live! (catch-all handler)\nReceived unmapped address: {addr} -> {args}"))
 
 server = osc_server.ThreadingOSCUDPServer(("127.0.0.1", LOCAL_PORT), disp)
 threading.Thread(target=server.serve_forever, daemon=True).start()
 print(f"Listening for Ableton replies on port {LOCAL_PORT}...")
 
 # =====================================================================
-#  Set up the client to send commands to Ableton.
+#  Initialize client to send commands to Ableton.
 #  Fire valid requests with Ableton running
 # =====================================================================
 osc_client = udp_client.SimpleUDPClient(ABLETON_IP, ABLETON_PORT)
 
-#print("Sending Ping to Ableton...")
+#print("Sending Ping to Ableton...")  ---NOT WORKING
 #osc_client.send_message("/live/test/ping", ["Python Check"])
 
-print("Verifying link by requesting project tempo...")
-osc_client.send_message("/live/song/get/tempo", [])
+#print("Verifying link by requesting project tempo...")
+#osc_client.send_message("/live/song/get/tempo", [])
 
-# Request current volume leve
-#osc_client.send_message("/live/master/get/volume", [])
+# Request current volume level of first track
+print("Querying current track 1 (index: 0) volume level ...")
+osc_client.send_message("/live/track/get/volume", [0])
+# Keep the script running for 5 seconds to receive the background data
+time.sleep(5.0)
 
+# Set volume level of first track
+target_volume_level = 0.75
+print(f"Setting track 1 (index: 0) volume to {target_volume_level*100:.0f}% depth ({target_volume_level})...")
+# Value must be a float in a list ([])
+osc_client.send_message("/live/track/set/volume", [0, target_volume_level])
+# Keep the script running for 5 seconds to send the background data
+time.sleep(5.0)
+
+# Request current volume level of first track
+print("Re-querying current track 1 (index: 0) volume level ...")
+osc_client.send_message("/live/track/get/volume", [0])
 # Keep the script running for 5 seconds to receive the background data
 time.sleep(5.0)
 
 if not connection_verified:
-    #print("\n[FAILURE] No response from Ableton. Python is shouting into the void.")
-    #print("-> Verify Ableton is running and AbletonOSC is selected under Link/MIDI Preferences.")
-    print("\n[FAILURE] Still no recognized response payload.")
+    print("\n[FAILURE] No response from Ableton. Not recognizing response payload.")
+    print("-> Verify Ableton is running and AbletonOSC is selected under Link/MIDI Preferences.")
 
 # Clean up
 server.shutdown()
