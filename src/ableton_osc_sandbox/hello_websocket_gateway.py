@@ -74,8 +74,8 @@ async def main():
     print("Waiting for browser/client connections...")
     # Start the WebSocket server and hold the thread infinitely
     #async with websockets.serve(handle_marimo_transaction, WS_HOST, WS_PORT):
-    # Remove ambiguity by explicitly naming the handler and host/port parameters.
-    async with websockets.serve(handler=handle_marimo_transaction, host=WS_HOST, port=WS_PORT):
+    #async with websockets.serve(handler=handle_marimo_transaction, host="localhost", port=8765):
+    async with websockets.serve(handle_marimo_transaction,WS_HOST,WS_PORT) as server:
         await asyncio.Future()  # Infinite thread hold
 
 
