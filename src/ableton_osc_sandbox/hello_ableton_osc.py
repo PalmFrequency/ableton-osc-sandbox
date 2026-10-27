@@ -40,7 +40,17 @@ LOCAL_PORT = 11001
 connection_verified = False
 
 # =====================================================================
-# CALLBACK HANDLER
+# SYNCHRONIZATION EVENT
+# This allows the main thread to wait securely for callbacks to fire,
+# replacing arbitrary time.sleep() delays with instant wake-ups or timeouts.
+# =====================================================================
+response_event = threading.Event()
+
+# =====================================================================
+# CALLBACK HANDLERS
+# These instantly unblock the main script by calling response_event.set()
+# =====================================================================
+
 # This handler will be triggered when Ableton responds to a 
 # /live/test/ping message.
 #
@@ -48,28 +58,21 @@ connection_verified = False
 # a global ping. AbletonOSC natively supports a /live/test/ping 
 # address, which forces Ableton to immediately echo back a reply on 
 # your listening port without needing to query a complex state.
-# =====================================================================
+
 def ping_handler(address, *args):
     global connection_verified
     connection_verified = True
     print("\n[SUCCESS] Confirmed Connection to Ableton Live! (ping_handler)")
     print(f"\n[SUCCESS] Connected! Received ping response from Ableton: {address} -> {args}")
+    response_event.set()  # 🟢 Wake up the main thread immediately
 
-# =====================================================================
-# CALLBACK HANDLER
-# =====================================================================
 def tempo_handler(address, *args):
     global connection_verified
     connection_verified = True
     print("\n[SUCCESS] Confirmed Connection to Ableton Live! (tempo_handler)")
     print(f"-> Current Project Tempo: {args[0]:.2f} BPM")
+    response_event.set()  # 🟢 Wake up the main thread immediately
 
-# =====================================================================
-# CALLBACK HANDLER
-# Callback function executed when Ableton replies with the volume.
-#
-# args[0] contains the float volume level (0.0 to 1.0)
-# =====================================================================
 def volume_handler(address, *args):
     global connection_verified
     connection_verified = True
@@ -77,6 +80,7 @@ def volume_handler(address, *args):
     # AbletonOSC returns volume as a list  [track_num:int, volume_level:float] (typically 0.0 to 1.0)
     volume_level = args[1]
     print(f"\n[Response] Track 1 Volume Level: {volume_level:.2f}")
+    response_event.set()  # 🟢 Wake up the main thread immediately
 
 # =====================================================================
 # Set up the local server to listen for Ableton's reply
@@ -100,30 +104,43 @@ print(f"Listening for Ableton replies on port {LOCAL_PORT}...")
 osc_client = udp_client.SimpleUDPClient(ABLETON_IP, ABLETON_PORT)
 
 #print("Sending Ping to Ableton...")  ---NOT WORKING
+#response_event.clear() # 🔴 Reset the event light to red
 #osc_client.send_message("/live/test/ping", ["Python Check"])
 
 #print("Verifying link by requesting project tempo...")
+#response_event.clear() # 🔴 Reset the event light to red
 #osc_client.send_message("/live/song/get/tempo", [])
 
 # Request current volume level of first track
 print("Querying current track 1 (index: 0) volume level ...")
+response_event.clear() # 🔴 Reset the event light to red
 osc_client.send_message("/live/track/get/volume", [0])
-# Keep the script running for 5 seconds to receive the background data
-time.sleep(5.0)
+# Wait max 10 seconds for the tempo_handler to set the event to green
+if not response_event.wait(timeout=10.0):
+    print("\n[FAILURE] Volume query timed out.")
+    print("-> Verify Ableton is running and AbletonOSC is selected under Link/MIDI Preferences.")
+    server.shutdown()
+    sys.exit(1)
 
 # Set volume level of first track
 target_volume_level = 0.75
 print(f"Setting track 1 (index: 0) volume to {target_volume_level*100:.0f}% depth ({target_volume_level})...")
 # Value must be a float in a list ([])
 osc_client.send_message("/live/track/set/volume", [0, target_volume_level])
-# Keep the script running for 5 seconds to send the background data
-time.sleep(5.0)
+# AbletonOSC 'set' commands do not echo a reply, so we use a tiny 0.1s pause 
+# just to let the DAW process it before querying the new state.
+time.sleep(0.1)
 
 # Request current volume level of first track
 print("Re-querying current track 1 (index: 0) volume level ...")
+response_event.clear() # 🔴 Reset the event light to red
 osc_client.send_message("/live/track/get/volume", [0])
-# Keep the script running for 5 seconds to receive the background data
-time.sleep(5.0)
+if not response_event.wait(timeout=10.0):
+    print("\n[FAILURE] Second volume query timed out.")
+    print("-> Verify Ableton is running and AbletonOSC is selected under Link/MIDI Preferences.")
+    server.shutdown()
+    sys.exit(1)
+
 
 if not connection_verified:
     print("\n[FAILURE] No response from Ableton. Not recognizing response payload.")
@@ -133,12 +150,3 @@ if not connection_verified:
 server.shutdown()
 server.server_close()
 print("Server shut down successfully.")
-
-
-# 1. Set the volume to 0%.
-#print("Setting master volume to 0%...")
-#osc_client.send_message("/live/master/volume", [0])
-
-# 2. Set the volume to 100%.
-#print("Setting master volume to 100%...")
-#osc_client.send_message("/live/master/volume", [1])
