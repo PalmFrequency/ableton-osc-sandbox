@@ -1,0 +1,2607 @@
+{
+    "source": {
+        "repository": "https://github.com/ideoforms/AbletonOSC",
+        "author": "https://github.com/ideoforms",
+        "license": "https://github.com/ideoforms/AbletonOSC?tab=MIT-1-ov-file",
+        "description": "Control Ableton Live via Open Sound Control (OSC)",
+        "notes": [
+            {
+                "date": "2026-10-28",
+                "type": "info",
+                "note": "mode property vals are \"get\", \"set\", \"subscribe\", \"unsubscribe\""
+            },
+            {
+                "date": "2026-10-28",
+                "type": "info",
+                "note": "min ableton version is 11.0."
+            }
+        ],
+        "parsed_markdown": "https://raw.githubusercontent.com/ideoforms/AbletonOSC/master/README.md",
+        "schema_version": "1.0.0",
+        "last_updated": "2026-10-28T18:33:08.461169+00:00"
+    },
+    "registry": [
+        {
+            "address": "/live/test",
+            "mode": "get",
+            "api": "Application API",
+            "description": "Display a confirmation message in Live, and sends an OSC reply to /live/test",
+            "args": [],
+            "response": [
+                {
+                    "name": "status",
+                    "type": "string",
+                    "description": "Returns \"ok\" if connection successful"
+                }
+            ],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/application/get/version",
+            "mode": "get",
+            "api": "Application API",
+            "description": "Query Live's version",
+            "args": [],
+            "response": [
+                {
+                    "name": "major_version",
+                    "type": "string",
+                    "description": "Current status of major_version"
+                },
+                {
+                    "name": "minor_version",
+                    "type": "string",
+                    "description": "Current status of minor_version"
+                }
+            ],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/api/reload",
+            "mode": "get",
+            "api": "Application API",
+            "description": "Initiates a live reload of the AbletonOSC server code. Used in development only.",
+            "args": [],
+            "response": [],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/api/get/log_level",
+            "mode": "get",
+            "api": "Application API",
+            "description": "Returns the current log level. Default is `info`.",
+            "args": [],
+            "response": [
+                {
+                    "name": "log_level",
+                    "type": "float",
+                    "description": "Current status of log_level"
+                }
+            ],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/api/set/log_level",
+            "mode": "set",
+            "api": "Application API",
+            "description": "Set the log level, which can be one of: `debug`, `info`, `warning`, `error`, `critical`.",
+            "args": [
+                {
+                    "name": "log_level",
+                    "type": "float",
+                    "optional": true,
+                    "description": "Target log_level property"
+                }
+            ],
+            "response": [],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/api/show_message",
+            "mode": "get",
+            "api": "Application API",
+            "description": "Show a message in Live's status bar",
+            "args": [
+                {
+                    "name": "message",
+                    "type": "float",
+                    "optional": true,
+                    "description": "Target message property"
+                }
+            ],
+            "response": [],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/view/get/selected_scene",
+            "mode": "get",
+            "api": "Beat events\n\nTo request a status message to be sent to the client on each beat, call `/live/song/start_listen/beat`. Every beat, a reply will be sent to `/live/song/get/beat`, with an int parameter containing the current beat number. To stop listening for beat events, call `/live/song/stop_listen/beat`.\n\n</details>\n\n---\n\n View API",
+            "description": "Returns the selected scene index (first scene = 0)",
+            "args": [],
+            "response": [
+                {
+                    "name": "scene_index",
+                    "type": "float",
+                    "description": "Current status of scene_index"
+                }
+            ],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/view/get/selected_track",
+            "mode": "get",
+            "api": "Beat events\n\nTo request a status message to be sent to the client on each beat, call `/live/song/start_listen/beat`. Every beat, a reply will be sent to `/live/song/get/beat`, with an int parameter containing the current beat number. To stop listening for beat events, call `/live/song/stop_listen/beat`.\n\n</details>\n\n---\n\n View API",
+            "description": "Returns the selected index track (first track = 0)",
+            "args": [],
+            "response": [
+                {
+                    "name": "track_index",
+                    "type": "float",
+                    "description": "Current status of track_index"
+                }
+            ],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/view/get/selected_clip",
+            "mode": "get",
+            "api": "Beat events\n\nTo request a status message to be sent to the client on each beat, call `/live/song/start_listen/beat`. Every beat, a reply will be sent to `/live/song/get/beat`, with an int parameter containing the current beat number. To stop listening for beat events, call `/live/song/stop_listen/beat`.\n\n</details>\n\n---\n\n View API",
+            "description": "Returns the track and scene index of the selected clip",
+            "args": [],
+            "response": [
+                {
+                    "name": "track_index",
+                    "type": "float",
+                    "description": "Current status of track_index"
+                },
+                {
+                    "name": "scene_index",
+                    "type": "float",
+                    "description": "Current status of scene_index"
+                }
+            ],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/view/get/selected_device",
+            "mode": "get",
+            "api": "Beat events\n\nTo request a status message to be sent to the client on each beat, call `/live/song/start_listen/beat`. Every beat, a reply will be sent to `/live/song/get/beat`, with an int parameter containing the current beat number. To stop listening for beat events, call `/live/song/stop_listen/beat`.\n\n</details>\n\n---\n\n View API",
+            "description": "Get the selected device (first device = 0)",
+            "args": [],
+            "response": [
+                {
+                    "name": "track_index",
+                    "type": "float",
+                    "description": "Current status of track_index"
+                },
+                {
+                    "name": "device_index",
+                    "type": "float",
+                    "description": "Current status of device_index"
+                }
+            ],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/view/set/selected_scene",
+            "mode": "set",
+            "api": "Beat events\n\nTo request a status message to be sent to the client on each beat, call `/live/song/start_listen/beat`. Every beat, a reply will be sent to `/live/song/get/beat`, with an int parameter containing the current beat number. To stop listening for beat events, call `/live/song/stop_listen/beat`.\n\n</details>\n\n---\n\n View API",
+            "description": "Set the selected scene (first scene = 0)",
+            "args": [
+                {
+                    "name": "scene_index",
+                    "type": "int",
+                    "optional": false,
+                    "description": "Target scene_index property"
+                }
+            ],
+            "response": [],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/view/set/selected_track",
+            "mode": "set",
+            "api": "Beat events\n\nTo request a status message to be sent to the client on each beat, call `/live/song/start_listen/beat`. Every beat, a reply will be sent to `/live/song/get/beat`, with an int parameter containing the current beat number. To stop listening for beat events, call `/live/song/stop_listen/beat`.\n\n</details>\n\n---\n\n View API",
+            "description": "Set the selected track (first track = 0)",
+            "args": [
+                {
+                    "name": "track_index",
+                    "type": "int",
+                    "optional": false,
+                    "description": "Target track_index property"
+                }
+            ],
+            "response": [],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/view/set/selected_clip",
+            "mode": "set",
+            "api": "Beat events\n\nTo request a status message to be sent to the client on each beat, call `/live/song/start_listen/beat`. Every beat, a reply will be sent to `/live/song/get/beat`, with an int parameter containing the current beat number. To stop listening for beat events, call `/live/song/stop_listen/beat`.\n\n</details>\n\n---\n\n View API",
+            "description": "Set the selected clip",
+            "args": [
+                {
+                    "name": "track_index",
+                    "type": "int",
+                    "optional": false,
+                    "description": "Target track_index property"
+                },
+                {
+                    "name": "scene_index",
+                    "type": "int",
+                    "optional": false,
+                    "description": "Target scene_index property"
+                }
+            ],
+            "response": [],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/view/set/selected_device",
+            "mode": "set",
+            "api": "Beat events\n\nTo request a status message to be sent to the client on each beat, call `/live/song/start_listen/beat`. Every beat, a reply will be sent to `/live/song/get/beat`, with an int parameter containing the current beat number. To stop listening for beat events, call `/live/song/stop_listen/beat`.\n\n</details>\n\n---\n\n View API",
+            "description": "Set the selected device (first device = 0)",
+            "args": [
+                {
+                    "name": "track_index",
+                    "type": "int",
+                    "optional": false,
+                    "description": "Target track_index property"
+                },
+                {
+                    "name": "device_index",
+                    "type": "int",
+                    "optional": false,
+                    "description": "Target device_index property"
+                }
+            ],
+            "response": [],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/view/start_listen/selected_scene",
+            "mode": "subscribe",
+            "api": "Beat events\n\nTo request a status message to be sent to the client on each beat, call `/live/song/start_listen/beat`. Every beat, a reply will be sent to `/live/song/get/beat`, with an int parameter containing the current beat number. To stop listening for beat events, call `/live/song/stop_listen/beat`.\n\n</details>\n\n---\n\n View API",
+            "description": "Start listening to the selected scene (first scene = 0)",
+            "args": [],
+            "response": [
+                {
+                    "name": "selected_scene",
+                    "type": "float",
+                    "description": "Current status of selected_scene"
+                }
+            ],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/view/start_listen/selected_track",
+            "mode": "subscribe",
+            "api": "Beat events\n\nTo request a status message to be sent to the client on each beat, call `/live/song/start_listen/beat`. Every beat, a reply will be sent to `/live/song/get/beat`, with an int parameter containing the current beat number. To stop listening for beat events, call `/live/song/stop_listen/beat`.\n\n</details>\n\n---\n\n View API",
+            "description": "Start listening to selected track (first track = 0)",
+            "args": [],
+            "response": [
+                {
+                    "name": "selected_track",
+                    "type": "float",
+                    "description": "Current status of selected_track"
+                }
+            ],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/view/stop_listen/selected_scene",
+            "mode": "unsubscribe",
+            "api": "Beat events\n\nTo request a status message to be sent to the client on each beat, call `/live/song/start_listen/beat`. Every beat, a reply will be sent to `/live/song/get/beat`, with an int parameter containing the current beat number. To stop listening for beat events, call `/live/song/stop_listen/beat`.\n\n</details>\n\n---\n\n View API",
+            "description": "Stop listening to the selected scene (first scene = 0)",
+            "args": [],
+            "response": [],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/view/stop_listen/selected_track",
+            "mode": "unsubscribe",
+            "api": "Beat events\n\nTo request a status message to be sent to the client on each beat, call `/live/song/start_listen/beat`. Every beat, a reply will be sent to `/live/song/get/beat`, with an int parameter containing the current beat number. To stop listening for beat events, call `/live/song/stop_listen/beat`.\n\n</details>\n\n---\n\n View API",
+            "description": "Stop listening to selected track (first track = 0)",
+            "args": [],
+            "response": [],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip_slot/fire",
+            "mode": "get",
+            "api": "Clip Slot API",
+            "description": "Fire play/pause of the specified clip slot",
+            "args": [
+                {
+                    "name": "track_index",
+                    "type": "int",
+                    "optional": false,
+                    "description": "Target track_index property"
+                },
+                {
+                    "name": "clip_index",
+                    "type": "int",
+                    "optional": false,
+                    "description": "Target clip_index property"
+                }
+            ],
+            "response": [],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip_slot/create_clip",
+            "mode": "get",
+            "api": "Clip Slot API",
+            "description": "Create a clip in the slot",
+            "args": [
+                {
+                    "name": "track_index",
+                    "type": "int",
+                    "optional": false,
+                    "description": "Target track_index property"
+                },
+                {
+                    "name": "clip_index",
+                    "type": "int",
+                    "optional": false,
+                    "description": "Target clip_index property"
+                },
+                {
+                    "name": "length",
+                    "type": "float",
+                    "optional": true,
+                    "description": "Target length property"
+                }
+            ],
+            "response": [],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip_slot/delete_clip",
+            "mode": "get",
+            "api": "Clip Slot API",
+            "description": "Delete the clip in the slot",
+            "args": [
+                {
+                    "name": "track_index",
+                    "type": "int",
+                    "optional": false,
+                    "description": "Target track_index property"
+                },
+                {
+                    "name": "clip_index",
+                    "type": "int",
+                    "optional": false,
+                    "description": "Target clip_index property"
+                }
+            ],
+            "response": [],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip_slot/get/has_clip",
+            "mode": "get",
+            "api": "Clip Slot API",
+            "description": "Query whether the slot has a clip",
+            "args": [
+                {
+                    "name": "track_index",
+                    "type": "int",
+                    "optional": false,
+                    "description": "Target track_index property"
+                },
+                {
+                    "name": "clip_index",
+                    "type": "int",
+                    "optional": false,
+                    "description": "Target clip_index property"
+                }
+            ],
+            "response": [
+                {
+                    "name": "track_index",
+                    "type": "float",
+                    "description": "Current status of track_index"
+                },
+                {
+                    "name": "clip_index",
+                    "type": "float",
+                    "description": "Current status of clip_index"
+                },
+                {
+                    "name": "has_clip",
+                    "type": "float",
+                    "description": "Current status of has_clip"
+                }
+            ],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip_slot/get/has_stop_button",
+            "mode": "get",
+            "api": "Clip Slot API",
+            "description": "Query whether the slot has a stop button",
+            "args": [
+                {
+                    "name": "track_index",
+                    "type": "int",
+                    "optional": false,
+                    "description": "Target track_index property"
+                },
+                {
+                    "name": "clip_index",
+                    "type": "int",
+                    "optional": false,
+                    "description": "Target clip_index property"
+                }
+            ],
+            "response": [
+                {
+                    "name": "track_index",
+                    "type": "float",
+                    "description": "Current status of track_index"
+                },
+                {
+                    "name": "clip_index",
+                    "type": "float",
+                    "description": "Current status of clip_index"
+                },
+                {
+                    "name": "has_stop_button",
+                    "type": "float",
+                    "description": "Current status of has_stop_button"
+                }
+            ],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip_slot/set/has_stop_button",
+            "mode": "set",
+            "api": "Clip Slot API",
+            "description": "Add or remove stop button (1=on, 0=off)",
+            "args": [
+                {
+                    "name": "track_index",
+                    "type": "int",
+                    "optional": false,
+                    "description": "Target track_index property"
+                },
+                {
+                    "name": "clip_index",
+                    "type": "int",
+                    "optional": false,
+                    "description": "Target clip_index property"
+                },
+                {
+                    "name": "has_stop_button",
+                    "type": "float",
+                    "optional": true,
+                    "description": "Target has_stop_button property"
+                }
+            ],
+            "response": [],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip_slot/duplicate_clip_to",
+            "mode": "get",
+            "api": "Clip Slot API",
+            "description": "Duplicate the clip to an empty target clip slot",
+            "args": [
+                {
+                    "name": "track_index",
+                    "type": "int",
+                    "optional": false,
+                    "description": "Target track_index property"
+                },
+                {
+                    "name": "clip_index",
+                    "type": "int",
+                    "optional": false,
+                    "description": "Target clip_index property"
+                },
+                {
+                    "name": "target_track_index",
+                    "type": "int",
+                    "optional": false,
+                    "description": "Target target_track_index property"
+                },
+                {
+                    "name": "target_clip_index",
+                    "type": "int",
+                    "optional": false,
+                    "description": "Target target_clip_index property"
+                }
+            ],
+            "response": [],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/fire",
+            "mode": "get",
+            "api": "Clip API",
+            "description": "Start clip playback",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                }
+            ],
+            "response": [],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/stop",
+            "mode": "get",
+            "api": "Clip API",
+            "description": "Stop clip playback",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                }
+            ],
+            "response": [],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/duplicate_loop",
+            "mode": "get",
+            "api": "Clip API",
+            "description": "Duplicates clip loop",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                }
+            ],
+            "response": [],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/get/notes",
+            "mode": "get",
+            "api": "Clip API",
+            "description": "Query the notes in a given clip, optionally including a start time/pitch and time/pitch span.",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                },
+                {
+                    "name": "start_pitch",
+                    "type": "float",
+                    "optional": true,
+                    "description": "Target start_pitch property"
+                },
+                {
+                    "name": "pitch_span",
+                    "type": "float",
+                    "optional": true,
+                    "description": "Target pitch_span property"
+                },
+                {
+                    "name": "start_time",
+                    "type": "float",
+                    "optional": true,
+                    "description": "Target start_time property"
+                },
+                {
+                    "name": "time_span",
+                    "type": "float",
+                    "optional": true,
+                    "description": "Target time_span property"
+                }
+            ],
+            "response": [
+                {
+                    "name": "track_id",
+                    "type": "float",
+                    "description": "Current status of track_id"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "float",
+                    "description": "Current status of clip_id"
+                },
+                {
+                    "name": "pitch",
+                    "type": "float",
+                    "description": "Current status of pitch"
+                },
+                {
+                    "name": "start_time",
+                    "type": "float",
+                    "description": "Current status of start_time"
+                },
+                {
+                    "name": "duration",
+                    "type": "float",
+                    "description": "Current status of duration"
+                },
+                {
+                    "name": "velocity",
+                    "type": "float",
+                    "description": "Current status of velocity"
+                },
+                {
+                    "name": "mute",
+                    "type": "float",
+                    "description": "Current status of mute"
+                },
+                {
+                    "name": "pitch",
+                    "type": "float",
+                    "description": "Current status of pitch"
+                },
+                {
+                    "name": "start_time...",
+                    "type": "float",
+                    "description": "Current status of start_time..."
+                }
+            ],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/add/notes",
+            "mode": "get",
+            "api": "Clip API",
+            "description": "Add new MIDI notes to a clip. pitch is MIDI note index, start_time and duration are beats in floats, velocity is MIDI velocity index, mute is true/false",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                },
+                {
+                    "name": "pitch",
+                    "type": "float",
+                    "optional": true,
+                    "description": "Target pitch property"
+                },
+                {
+                    "name": "start_time",
+                    "type": "float",
+                    "optional": true,
+                    "description": "Target start_time property"
+                },
+                {
+                    "name": "duration",
+                    "type": "float",
+                    "optional": true,
+                    "description": "Target duration property"
+                },
+                {
+                    "name": "velocity",
+                    "type": "float",
+                    "optional": true,
+                    "description": "Target velocity property"
+                },
+                {
+                    "name": "mute",
+                    "type": "float",
+                    "optional": true,
+                    "description": "Target mute property"
+                },
+                {
+                    "name": "...",
+                    "type": "float",
+                    "optional": true,
+                    "description": "Target ... property"
+                }
+            ],
+            "response": [],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/remove/notes",
+            "mode": "get",
+            "api": "Clip API",
+            "description": "Remove notes from a clip in a range of pitches and times. If no ranges specified, all notes are removed. Note that ordering has changed as of 2023-11.",
+            "args": [
+                {
+                    "name": "start_pitch",
+                    "type": "float",
+                    "optional": true,
+                    "description": "Target start_pitch property"
+                },
+                {
+                    "name": "pitch_span",
+                    "type": "float",
+                    "optional": true,
+                    "description": "Target pitch_span property"
+                },
+                {
+                    "name": "start_time",
+                    "type": "float",
+                    "optional": true,
+                    "description": "Target start_time property"
+                },
+                {
+                    "name": "time_span",
+                    "type": "float",
+                    "optional": true,
+                    "description": "Target time_span property"
+                }
+            ],
+            "response": [],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/get/color",
+            "mode": "get",
+            "api": "Clip API",
+            "description": "Get clip color",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                }
+            ],
+            "response": [
+                {
+                    "name": "track_id",
+                    "type": "float",
+                    "description": "Current status of track_id"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "float",
+                    "description": "Current status of clip_id"
+                },
+                {
+                    "name": "color",
+                    "type": "float",
+                    "description": "Current status of color"
+                }
+            ],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/set/color",
+            "mode": "set",
+            "api": "Clip API",
+            "description": "Set clip color",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                },
+                {
+                    "name": "color",
+                    "type": "float",
+                    "optional": true,
+                    "description": "Target color property"
+                }
+            ],
+            "response": [],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/get/color_index",
+            "mode": "get",
+            "api": "Clip API",
+            "description": "Get clip color index (0-69)",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                }
+            ],
+            "response": [
+                {
+                    "name": "track_id",
+                    "type": "float",
+                    "description": "Current status of track_id"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "float",
+                    "description": "Current status of clip_id"
+                },
+                {
+                    "name": "color_index",
+                    "type": "float",
+                    "description": "Current status of color_index"
+                }
+            ],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/set/color_index",
+            "mode": "set",
+            "api": "Clip API",
+            "description": "Set clip color index (0-69)",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                },
+                {
+                    "name": "color_index",
+                    "type": "int",
+                    "optional": false,
+                    "description": "Target color_index property"
+                }
+            ],
+            "response": [],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/get/name",
+            "mode": "get",
+            "api": "Clip API",
+            "description": "Get clip name",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                }
+            ],
+            "response": [
+                {
+                    "name": "track_id",
+                    "type": "float",
+                    "description": "Current status of track_id"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "float",
+                    "description": "Current status of clip_id"
+                },
+                {
+                    "name": "name",
+                    "type": "string",
+                    "description": "Current status of name"
+                }
+            ],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/set/name",
+            "mode": "set",
+            "api": "Clip API",
+            "description": "Set clip name",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                },
+                {
+                    "name": "name",
+                    "type": "float",
+                    "optional": true,
+                    "description": "Target name property"
+                }
+            ],
+            "response": [],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/get/gain",
+            "mode": "get",
+            "api": "Clip API",
+            "description": "Get clip gain",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                }
+            ],
+            "response": [
+                {
+                    "name": "track_id",
+                    "type": "float",
+                    "description": "Current status of track_id"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "float",
+                    "description": "Current status of clip_id"
+                },
+                {
+                    "name": "gain",
+                    "type": "float",
+                    "description": "Current status of gain"
+                }
+            ],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/set/gain",
+            "mode": "set",
+            "api": "Clip API",
+            "description": "Set clip gain",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                },
+                {
+                    "name": "gain",
+                    "type": "float",
+                    "optional": true,
+                    "description": "Target gain property"
+                }
+            ],
+            "response": [],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/get/length",
+            "mode": "get",
+            "api": "Clip API",
+            "description": "Get clip length",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                }
+            ],
+            "response": [
+                {
+                    "name": "track_id",
+                    "type": "float",
+                    "description": "Current status of track_id"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "float",
+                    "description": "Current status of clip_id"
+                },
+                {
+                    "name": "length",
+                    "type": "float",
+                    "description": "Current status of length"
+                }
+            ],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/get/sample_length",
+            "mode": "get",
+            "api": "Clip API",
+            "description": "Get clip sample length",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                }
+            ],
+            "response": [
+                {
+                    "name": "track_id",
+                    "type": "float",
+                    "description": "Current status of track_id"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "float",
+                    "description": "Current status of clip_id"
+                },
+                {
+                    "name": "sample_length",
+                    "type": "float",
+                    "description": "Current status of sample_length"
+                }
+            ],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/get/start_time",
+            "mode": "get",
+            "api": "Clip API",
+            "description": "Get clip start time",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                }
+            ],
+            "response": [
+                {
+                    "name": "track_id",
+                    "type": "float",
+                    "description": "Current status of track_id"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "float",
+                    "description": "Current status of clip_id"
+                },
+                {
+                    "name": "start_time",
+                    "type": "float",
+                    "description": "Current status of start_time"
+                }
+            ],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/get/pitch_coarse",
+            "mode": "get",
+            "api": "Clip API",
+            "description": "Get clip coarse re-pitch",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                }
+            ],
+            "response": [
+                {
+                    "name": "track_id",
+                    "type": "float",
+                    "description": "Current status of track_id"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "float",
+                    "description": "Current status of clip_id"
+                },
+                {
+                    "name": "semitones",
+                    "type": "float",
+                    "description": "Current status of semitones"
+                }
+            ],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/set/pitch_coarse",
+            "mode": "set",
+            "api": "Clip API",
+            "description": "Set clip coarse re-pitch",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                },
+                {
+                    "name": "semitones",
+                    "type": "float",
+                    "optional": true,
+                    "description": "Target semitones property"
+                }
+            ],
+            "response": [],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/get/pitch_fine",
+            "mode": "get",
+            "api": "Clip API",
+            "description": "Get clip fine re-pitch",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                }
+            ],
+            "response": [
+                {
+                    "name": "track_id",
+                    "type": "float",
+                    "description": "Current status of track_id"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "float",
+                    "description": "Current status of clip_id"
+                },
+                {
+                    "name": "cents",
+                    "type": "float",
+                    "description": "Current status of cents"
+                }
+            ],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/set/pitch_fine",
+            "mode": "set",
+            "api": "Clip API",
+            "description": "Set clip fine re-pitch",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                },
+                {
+                    "name": "cents",
+                    "type": "float",
+                    "optional": true,
+                    "description": "Target cents property"
+                }
+            ],
+            "response": [],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/get/file_path",
+            "mode": "get",
+            "api": "Clip API",
+            "description": "Get clip file path",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                }
+            ],
+            "response": [
+                {
+                    "name": "track_id",
+                    "type": "float",
+                    "description": "Current status of track_id"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "float",
+                    "description": "Current status of clip_id"
+                },
+                {
+                    "name": "file_path",
+                    "type": "string",
+                    "description": "Current status of file_path"
+                }
+            ],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/get/is_audio_clip",
+            "mode": "get",
+            "api": "Clip API",
+            "description": "Query whether clip is audio",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                }
+            ],
+            "response": [
+                {
+                    "name": "track_id",
+                    "type": "float",
+                    "description": "Current status of track_id"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "float",
+                    "description": "Current status of clip_id"
+                },
+                {
+                    "name": "is_audio_clip",
+                    "type": "float",
+                    "description": "Current status of is_audio_clip"
+                }
+            ],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/get/is_midi_clip",
+            "mode": "get",
+            "api": "Clip API",
+            "description": "Query whether clip is MIDI",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                }
+            ],
+            "response": [
+                {
+                    "name": "track_id",
+                    "type": "float",
+                    "description": "Current status of track_id"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "float",
+                    "description": "Current status of clip_id"
+                },
+                {
+                    "name": "is_midi_clip",
+                    "type": "float",
+                    "description": "Current status of is_midi_clip"
+                }
+            ],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/get/is_playing",
+            "mode": "get",
+            "api": "Clip API",
+            "description": "Query whether clip is playing",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                }
+            ],
+            "response": [
+                {
+                    "name": "track_id",
+                    "type": "float",
+                    "description": "Current status of track_id"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "float",
+                    "description": "Current status of clip_id"
+                },
+                {
+                    "name": "is_playing",
+                    "type": "float",
+                    "description": "Current status of is_playing"
+                }
+            ],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/get/is_overdubbing",
+            "mode": "get",
+            "api": "Clip API",
+            "description": "Query whether clip is overdubbing",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                }
+            ],
+            "response": [
+                {
+                    "name": "track_id",
+                    "type": "float",
+                    "description": "Current status of track_id"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "float",
+                    "description": "Current status of clip_id"
+                },
+                {
+                    "name": "is_overdubbing",
+                    "type": "float",
+                    "description": "Current status of is_overdubbing"
+                }
+            ],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/get/is_recording",
+            "mode": "get",
+            "api": "Clip API",
+            "description": "Query whether clip is recording",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                }
+            ],
+            "response": [
+                {
+                    "name": "track_id",
+                    "type": "float",
+                    "description": "Current status of track_id"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "float",
+                    "description": "Current status of clip_id"
+                },
+                {
+                    "name": "is_recording",
+                    "type": "float",
+                    "description": "Current status of is_recording"
+                }
+            ],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/get/will_record_on_start",
+            "mode": "get",
+            "api": "Clip API",
+            "description": "Query whether clip will record on start",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                }
+            ],
+            "response": [
+                {
+                    "name": "track_id",
+                    "type": "float",
+                    "description": "Current status of track_id"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "float",
+                    "description": "Current status of clip_id"
+                },
+                {
+                    "name": "will_record_on_start",
+                    "type": "float",
+                    "description": "Current status of will_record_on_start"
+                }
+            ],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/get/playing_position",
+            "mode": "get",
+            "api": "Clip API",
+            "description": "Get clip's playing position",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                }
+            ],
+            "response": [
+                {
+                    "name": "track_id",
+                    "type": "float",
+                    "description": "Current status of track_id"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "float",
+                    "description": "Current status of clip_id"
+                },
+                {
+                    "name": "playing_position",
+                    "type": "float",
+                    "description": "Current status of playing_position"
+                }
+            ],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/start_listen/playing_position",
+            "mode": "subscribe",
+            "api": "Clip API",
+            "description": "Start listening for clip's playing position. Replies are sent to /live/clip/get/playing_position, with args: track_id, clip_id, playing_position",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                }
+            ],
+            "response": [],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/stop_listen/playing_position",
+            "mode": "unsubscribe",
+            "api": "Clip API",
+            "description": "Stop listening for clip's playing position.",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                }
+            ],
+            "response": [],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/get/loop_start",
+            "mode": "get",
+            "api": "Clip API",
+            "description": "Get clip's loop start",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                }
+            ],
+            "response": [
+                {
+                    "name": "track_id",
+                    "type": "float",
+                    "description": "Current status of track_id"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "float",
+                    "description": "Current status of clip_id"
+                },
+                {
+                    "name": "loop_start",
+                    "type": "float",
+                    "description": "Current status of loop_start"
+                }
+            ],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/set/loop_start",
+            "mode": "set",
+            "api": "Clip API",
+            "description": "Set clip's loop start",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                },
+                {
+                    "name": "loop_start",
+                    "type": "float",
+                    "optional": true,
+                    "description": "Target loop_start property"
+                }
+            ],
+            "response": [],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/get/loop_end",
+            "mode": "get",
+            "api": "Clip API",
+            "description": "Get clip's loop end",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                }
+            ],
+            "response": [
+                {
+                    "name": "track_id",
+                    "type": "float",
+                    "description": "Current status of track_id"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "float",
+                    "description": "Current status of clip_id"
+                },
+                {
+                    "name": "loop_end",
+                    "type": "float",
+                    "description": "Current status of loop_end"
+                }
+            ],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/set/loop_end",
+            "mode": "set",
+            "api": "Clip API",
+            "description": "Set clip's loop end",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                },
+                {
+                    "name": "loop_end",
+                    "type": "float",
+                    "optional": true,
+                    "description": "Target loop_end property"
+                }
+            ],
+            "response": [],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/get/warping",
+            "mode": "get",
+            "api": "Clip API",
+            "description": "Get clip's warp mode",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                }
+            ],
+            "response": [
+                {
+                    "name": "track_id",
+                    "type": "float",
+                    "description": "Current status of track_id"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "float",
+                    "description": "Current status of clip_id"
+                },
+                {
+                    "name": "warping",
+                    "type": "float",
+                    "description": "Current status of warping"
+                }
+            ],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/set/warping",
+            "mode": "set",
+            "api": "Clip API",
+            "description": "Set clip's warp mode",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                },
+                {
+                    "name": "warping",
+                    "type": "float",
+                    "optional": true,
+                    "description": "Target warping property"
+                }
+            ],
+            "response": [],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/get/launch_mode",
+            "mode": "get",
+            "api": "Clip API",
+            "description": "Get clip's launch mode (0=Trigger, 1=Gate, 2=Toggle, 3=Repeat)",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                }
+            ],
+            "response": [
+                {
+                    "name": "track_id",
+                    "type": "float",
+                    "description": "Current status of track_id"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "float",
+                    "description": "Current status of clip_id"
+                },
+                {
+                    "name": "launch_mode",
+                    "type": "float",
+                    "description": "Current status of launch_mode"
+                }
+            ],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/set/launch_mode",
+            "mode": "set",
+            "api": "Clip API",
+            "description": "Set clip's launch mode (0=Trigger, 1=Gate, 2=Toggle, 3=Repeat)",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                },
+                {
+                    "name": "launch_mode",
+                    "type": "float",
+                    "optional": true,
+                    "description": "Target launch_mode property"
+                }
+            ],
+            "response": [],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/get/launch_quantization",
+            "mode": "get",
+            "api": "Clip API",
+            "description": "Get clip's launch Quantization Value (0=Global, 1=None, 2=8Bars, 3=4Bars, 4=2Bars, 5=1Bar, 6=1/2, 7=1/2T, 8=1/4, 9=1/4T, 10=1/8, 11=1/8T, 12=1/16, 13=1/16T, 14=1/32)",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                }
+            ],
+            "response": [
+                {
+                    "name": "track_id",
+                    "type": "float",
+                    "description": "Current status of track_id"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "float",
+                    "description": "Current status of clip_id"
+                },
+                {
+                    "name": "launch_quantization",
+                    "type": "float",
+                    "description": "Current status of launch_quantization"
+                }
+            ],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/set/launch_quantization",
+            "mode": "set",
+            "api": "Clip API",
+            "description": "Set clip's launch Quantization Value (0=Global, 1=None, 2=8Bars, 3=4Bars, 4=2Bars, 5=1Bar, 6=1/2, 7=1/2T, 8=1/4, 9=1/4T, 10=1/8, 11=1/8T, 12=1/16, 13=1/16T, 14=1/32)",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                },
+                {
+                    "name": "launch_quantization",
+                    "type": "float",
+                    "optional": true,
+                    "description": "Target launch_quantization property"
+                }
+            ],
+            "response": [],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/get/ram_mode",
+            "mode": "get",
+            "api": "Clip API",
+            "description": "Get clip's Ram Mode (0=False, 1=True)",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                }
+            ],
+            "response": [
+                {
+                    "name": "track_id",
+                    "type": "float",
+                    "description": "Current status of track_id"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "float",
+                    "description": "Current status of clip_id"
+                },
+                {
+                    "name": "ram_mode",
+                    "type": "float",
+                    "description": "Current status of ram_mode"
+                }
+            ],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/set/ram_mode",
+            "mode": "set",
+            "api": "Clip API",
+            "description": "Set clip's Ram Mode (0=False, 1=True)",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                },
+                {
+                    "name": "ram_mode",
+                    "type": "float",
+                    "optional": true,
+                    "description": "Target ram_mode property"
+                }
+            ],
+            "response": [],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/get/warp_mode",
+            "mode": "get",
+            "api": "Clip API",
+            "description": "Get clip's Warp Mode (0=Beats, 1=Tones, 2=Texture, 3=Re-Pitch, 4=Complex, 5=Invalid/Error, 6=Pro)",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                }
+            ],
+            "response": [
+                {
+                    "name": "track_id",
+                    "type": "float",
+                    "description": "Current status of track_id"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "float",
+                    "description": "Current status of clip_id"
+                },
+                {
+                    "name": "warp_mode",
+                    "type": "float",
+                    "description": "Current status of warp_mode"
+                }
+            ],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/set/warp_mode",
+            "mode": "set",
+            "api": "Clip API",
+            "description": "Set clip's Warp Mode (0=Beats, 1=Tones, 2=Texture, 3=Re-Pitch, 4=Complex, 5=Invalid/Error, 6=Pro)",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                },
+                {
+                    "name": "warp_mode",
+                    "type": "float",
+                    "optional": true,
+                    "description": "Target warp_mode property"
+                }
+            ],
+            "response": [],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/get/has_groove",
+            "mode": "get",
+            "api": "Clip API",
+            "description": "Get clip Groove state (0=False, 1=True)",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                }
+            ],
+            "response": [
+                {
+                    "name": "track_id",
+                    "type": "float",
+                    "description": "Current status of track_id"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "float",
+                    "description": "Current status of clip_id"
+                },
+                {
+                    "name": "has_groove",
+                    "type": "float",
+                    "description": "Current status of has_groove"
+                }
+            ],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/get/legato",
+            "mode": "get",
+            "api": "Clip API",
+            "description": "Get clip's Legato state (0=False, 1=True)",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                }
+            ],
+            "response": [
+                {
+                    "name": "track_id",
+                    "type": "float",
+                    "description": "Current status of track_id"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "float",
+                    "description": "Current status of clip_id"
+                },
+                {
+                    "name": "legato",
+                    "type": "float",
+                    "description": "Current status of legato"
+                }
+            ],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/set/legato",
+            "mode": "set",
+            "api": "Clip API",
+            "description": "Set clip's Legato state (0=False, 1=True)",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                },
+                {
+                    "name": "legato",
+                    "type": "float",
+                    "optional": true,
+                    "description": "Target legato property"
+                }
+            ],
+            "response": [],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/get/position",
+            "mode": "get",
+            "api": "Clip API",
+            "description": "Get clip's position (LoopStart)",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                }
+            ],
+            "response": [
+                {
+                    "name": "track_id",
+                    "type": "float",
+                    "description": "Current status of track_id"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "float",
+                    "description": "Current status of clip_id"
+                },
+                {
+                    "name": "position",
+                    "type": "float",
+                    "description": "Current status of position"
+                }
+            ],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/set/position",
+            "mode": "set",
+            "api": "Clip API",
+            "description": "Set clip's position (LoopStart)",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                },
+                {
+                    "name": "position",
+                    "type": "float",
+                    "optional": true,
+                    "description": "Target position property"
+                }
+            ],
+            "response": [],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/get/muted",
+            "mode": "get",
+            "api": "Clip API",
+            "description": "Get clip's Muted state (0=False, 1=True)",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                }
+            ],
+            "response": [
+                {
+                    "name": "track_id",
+                    "type": "float",
+                    "description": "Current status of track_id"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "float",
+                    "description": "Current status of clip_id"
+                },
+                {
+                    "name": "muted",
+                    "type": "float",
+                    "description": "Current status of muted"
+                }
+            ],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/set/muted",
+            "mode": "set",
+            "api": "Clip API",
+            "description": "Set clip's Muted state (0=False, 1=True)",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                },
+                {
+                    "name": "muted",
+                    "type": "float",
+                    "optional": true,
+                    "description": "Target muted property"
+                }
+            ],
+            "response": [],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/get/velocity_amount",
+            "mode": "get",
+            "api": "Clip API",
+            "description": "Get clip's Velocity Amount (0.0-1.0 aka 0% to 100%)",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                }
+            ],
+            "response": [
+                {
+                    "name": "track_id",
+                    "type": "float",
+                    "description": "Current status of track_id"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "float",
+                    "description": "Current status of clip_id"
+                },
+                {
+                    "name": "velocity_amount",
+                    "type": "float",
+                    "description": "Current status of velocity_amount"
+                }
+            ],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/set/velocity_amount",
+            "mode": "set",
+            "api": "Clip API",
+            "description": "Set clip's Velocity Amount (0.0-1.0 aka 0% to 100%)",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                },
+                {
+                    "name": "velocity_amount",
+                    "type": "float",
+                    "optional": true,
+                    "description": "Target velocity_amount property"
+                }
+            ],
+            "response": [],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/get/start_marker",
+            "mode": "get",
+            "api": "Clip API",
+            "description": "Get clip's start marker",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                }
+            ],
+            "response": [
+                {
+                    "name": "track_id",
+                    "type": "float",
+                    "description": "Current status of track_id"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "float",
+                    "description": "Current status of clip_id"
+                },
+                {
+                    "name": "start_marker",
+                    "type": "float",
+                    "description": "Current status of start_marker"
+                }
+            ],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/set/start_marker",
+            "mode": "set",
+            "api": "Clip API",
+            "description": "Set clip's start marker, expressed in floating-point beats",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                },
+                {
+                    "name": "start_marker",
+                    "type": "float",
+                    "optional": true,
+                    "description": "Target start_marker property"
+                }
+            ],
+            "response": [],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/get/end_marker",
+            "mode": "get",
+            "api": "Clip API",
+            "description": "Get clip's end marker",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                }
+            ],
+            "response": [
+                {
+                    "name": "track_id",
+                    "type": "float",
+                    "description": "Current status of track_id"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "float",
+                    "description": "Current status of clip_id"
+                },
+                {
+                    "name": "end_marker",
+                    "type": "float",
+                    "description": "Current status of end_marker"
+                }
+            ],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        },
+        {
+            "address": "/live/clip/set/end_marker",
+            "mode": "set",
+            "api": "Clip API",
+            "description": "Set clip's end marker, expressed in floating-point beats",
+            "args": [
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target track_id property"
+                },
+                {
+                    "name": "clip_id",
+                    "type": "int",
+                    "optional": true,
+                    "description": "Target clip_id property"
+                },
+                {
+                    "name": "end_marker",
+                    "type": "float",
+                    "optional": true,
+                    "description": "Target end_marker property"
+                }
+            ],
+            "response": [],
+            "notes": [],
+            "last_updated": "2026-10-28"
+        }
+    ]
+}

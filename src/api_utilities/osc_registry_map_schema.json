@@ -1,0 +1,57 @@
+{
+    "source": 
+    {
+        "repository":"https://github.com/ideoforms/AbletonOSC",
+            "author": "https://github.com/ideoforms",
+            "license": "https://github.com/ideoforms/AbletonOSC?tab=MIT-1-ov-file",
+            "description": "Control Ableton Live via Open Sound Control (OSC)",
+            "min_ableton_version": "11.0",
+            "notes":[
+                {
+                    "date": "2026-10-28",
+                    "type": "info",
+                    "note": "mode property vals are \"get\", \"set\", \"subscribe\", \"unsubscribe\""
+                },
+                {
+                    "date": "2026-10-28",
+                    "type": "info",
+                    "note": "min_ableton_version is 11.0."
+                }
+            ],
+            "parsed_markdown": "https://raw.githubusercontent.com/ideoforms/AbletonOSC/master/README.md",
+            "schema_version": "1.0.0",
+            "last_updated": "2026-10-28T17:54:00+00:00"
+    },
+    "registry":
+    [
+        {
+            "address": "/live/test",
+            "mode": "get",
+            "api": "Application API",
+            "description": "Display a confirmation message in Live, and sends an OSC reply to /live/test",
+            "args": [
+                {
+                    "name": "volume",
+                    "type": "float",
+                    "optional": true,
+                    "description": "The volume level (0.0 to 1.0)"
+                },
+                {
+                    "name": "track_id",
+                    "type": "int",
+                    "optional": false,
+                    "description": "The ID of the track"
+                }
+            ],
+            "response":[
+                {
+                    "name": "status",
+                    "type": "string",
+                    "description": "Returns \"ok\" if connection successful"
+                }
+            ],
+            "notes":[],
+            "last_updated": "2026-10-28T17:54:00+00:00"
+        }
+    ]
+}
