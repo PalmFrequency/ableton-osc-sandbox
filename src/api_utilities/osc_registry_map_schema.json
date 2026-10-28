@@ -10,12 +10,17 @@
                 {
                     "date": "2026-10-28",
                     "type": "info",
-                    "note": "mode property vals are \"get\", \"set\", \"subscribe\", \"unsubscribe\""
+                    "note": "mode property vals are \"get\", \"set\", \"observe\", \"unobserve\"."
                 },
                 {
                     "date": "2026-10-28",
                     "type": "info",
-                    "note": "min_ableton_version is 11.0."
+                    "note": "min ableton version is 11.0."
+                },
+                {
+                    "date": "2026-10-28",
+                    "type": "info",
+                    "note": "Ableton Live Object Model (LOM) reference: https://docs.cycling74.com/apiref/lom/"
                 }
             ],
             "parsed_markdown": "https://raw.githubusercontent.com/ideoforms/AbletonOSC/master/README.md",

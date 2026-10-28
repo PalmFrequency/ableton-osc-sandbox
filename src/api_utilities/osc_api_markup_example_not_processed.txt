@@ -1,12 +1,56 @@
-### Application status messages
-
-These messages are sent to the client automatically when the application state changes.
-
-| Address       | Response params | Description                                                                                        |
-|:--------------|:----------------|:---------------------------------------------------------------------------------------------------|
-| /live/startup |                 | Sent to the client application when AbletonOSC is started                                          |
-| /live/error   | error_msg       | Sent to the client application when an error occurs. For more diagnostics, see logs/abletonosc.log |
+AbletonOSC listens for OSC messages on port 11000, and sends replies on port 11001. Replies will be sent to the same IP as the originating message. When querying properties, OSC wildcard patterns can be used; for example, /live/clip/get/* 0 0 will query all the properties of track 0, clip 0.
 
 
+#1
+AbletonOSC listens for OSC messages on port 11000, and sends replies on port 11001. Replies will be sent to the same IP as the originating message. When querying properties, OSC wildcard patterns can be used; for example, /live/clip/get/* 0 0 will query all the properties of track 0, clip 0.
 
+#2
+Changes to any Track property can be listened for by calling /live/song/start_listen/<property>
+Responses will be sent to /live/song/get/<property>, with parameters <property_value>
+For further information on these properties and their parameters, see documentation for Live Object Model - Song.
+https://docs.cycling74.com/max8/vignettes/live_object_model#Song
 
+#3
+Querying track/clip data in bulk with /live/song/get/track_data
+It is often useful to be able to query data en masse about lots of different tracks and clips -- for example, when a set is first opened, to synchronise the state of your client with the Ableton set. This can be achieved with the /live/song/get/track_data API, which can query user-specified properties of multiple tracks and clips.
+
+Properties must be of the format track.property_name, clip.property_name or clip_slot.property_name.
+
+For example:
+
+/live/song/get/track_data 0 12 track.name clip.name clip.length
+Queries tracks 0..11, and returns a long list of values comprising:
+
+[track_0_name, clip_0_0_name,   clip_0_1_name,   ... clip_0_7_name,
+               clip_1_0_length, clip_0_1_length, ... clip_0_7_length,
+ track_1_name, clip_1_0_name,   clip_1_1_name,   ... clip_1_7_name, ...]
+
+#4
+Beat events
+To request a status message to be sent to the client on each beat, call /live/song/start_listen/beat. Every beat, a reply will be sent to /live/song/get/beat, with an int parameter containing the current beat number. To stop listening for beat events, call /live/song/stop_listen/beat.
+
+#5
+Track properties
+Changes for any Track property can be listened for by calling /live/track/start_listen/<property> <track_index>
+Responses will be sent to /live/track/get/<property>, with parameters <track_index> <property_value>
+
+#6
+Scene properties
+Changes for any Scene property can be listened for by calling /live/scene/start_listen/<property> <scene_index>
+Responses will be sent to /live/scene/get/<property>, with parameters <scene_index> <property_value>
+
+#7
+Device properties
+Changes for any Parameter property can be listened for by calling /live/device/start_listen/parameter/value <track_index> <device index> <parameter_index>
+
+For devices:
+
+name is the human-readable name
+type is 1 = audio_effect, 2 = instrument, 4 = midi_effect
+class_name is the Live instrument/effect name, e.g. Operator, Reverb. For external plugins and racks, can be AuPluginDevice, PluginDevice, InstrumentGroupDevice...
+
+#8
+MidiMap API
+Note that, for consistency with other object types (and Live's internal API), channels are indexed from zero - so MIDI channel 1 should be queried with index 0, etc.
+
+#9

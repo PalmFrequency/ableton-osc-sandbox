@@ -5,7 +5,7 @@ import urllib.request
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
-# Raw README source URL from the official repository
+# Raw README markdown source URL from the official repository
 README_URL = "https://raw.githubusercontent.com/ideoforms/AbletonOSC/master/README.md"
 
 def fetch_raw_readme(url=README_URL):
@@ -32,20 +32,34 @@ def parse_markdown_tables(md_content):
                 {
                     "date": "2026-10-28",
                     "type": "info",
-                    "note": "mode property vals are \"get\", \"set\", \"subscribe\", \"unsubscribe\""
+                    "note": "mode property vals are \"get\", \"set\", \"observe\", \"unobserve\"."
                 },
                 {
                     "date": "2026-10-28",
                     "type": "info",
                     "note": "min ableton version is 11.0."
+                },
+                {
+                    "date": "2026-10-28",
+                    "type": "info",
+                    "note": "Ableton Live Object Model (LOM) reference: https://docs.cycling74.com/apiref/lom/"
                 }
             ],
-            "parsed_markdown": "https://raw.githubusercontent.com/ideoforms/AbletonOSC/master/README.md",
+            "parsed_markdown": README_URL,
             "schema_version": "1.0.0",
             "last_updated": datetime.now(timezone.utc).isoformat()
         },
         "registry": []
     }
+
+    # Regex expression matches headers describing API groups (e.g. "## Application API")
+    # and lines starting with the OSC address prefix (e.g. "| /live/..."). Each processed
+    # address prefix will be associated with the last API group header encountered in the 
+    # Markdown file.
+    #matching_line: list[str] = [line for line in md_content.splitlines() if line.startswith(('## ', '| /live/'))]
+    matching_lines:list[str] = extract_from_string(md_content).splitlines()
+
+
 
     # Split documentation into blocks corresponding to major headings
     sections = re.findall(r'(##\s+.*?API.*?)\n(.*?)(?=\n##|$)', md_content, re.DOTALL)
@@ -84,6 +98,42 @@ def parse_markdown_tables(md_content):
             
     return registry_data
 
+# Parse the README content to extract only the relevant lines for processing
+def extract_from_string(text_content: str) -> str:
+    address_records: list[str] = []
+    selected_lines = []
+    capture_block = False
+    block_buffer = []
+
+    # splitlines() handles \n, \r\n, and keeps line formatting clean
+    for line in text_content.splitlines(keepends=True):
+        if line.startswith("| /live/"):
+            selected_lines.append(line)
+
+        elif line.startswith("## "):
+            capture_block = True
+            block_buffer = [line]
+
+        elif capture_block:
+            if "<details>" in line:
+                selected_lines.extend(block_buffer)
+                block_buffer = []
+                capture_block = False
+            else:
+                block_buffer.append(line)
+
+    joined_lines = "".join(selected_lines)
+    for ine in joined_lines.splitlines(keepends=True):
+        if ine.startswith("| /live/"):
+            selected_lines.append(ine)
+        elif ine.startswith("## "):
+            selected_lines.append(ine)
+        elif "<details>" in ine:
+            break
+
+    return "".join(selected_lines)
+
+
 def handle_edge_cases(address, api_group, cols, col_map):
     """
     Interceptor layer that aligns indices via headers and formats clean schemas.
@@ -99,9 +149,9 @@ def handle_edge_cases(address, api_group, cols, col_map):
     if "/set/" in address:
         mode = "set"
     elif "/start_listen/" in address:
-        mode = "subscribe"
+        mode = "observe"
     elif "/stop_listen/" in address:
-        mode = "unsubscribe"
+        mode = "unobserve"
     else:
         mode = "get"
 
@@ -168,6 +218,28 @@ def handle_edge_cases(address, api_group, cols, col_map):
                 })
 
     return entry
+
+
+class ParsedOSCEntry:
+    def __init__(
+        self, 
+        api_name: str, 
+        address: str, 
+        query_params: list[str], 
+        response: list[str], 
+        description: str, 
+        timestamp: datetime
+    ):
+        self.api_name = api_name
+        self.address = address
+        self.query_params = query_params
+        self.response = response
+        self.description = description
+        self.timestamp = timestamp
+
+    def __str__(self):
+        return f"{self.api_name} ({self.address}) - {self.description}"
+
 
 if __name__ == "__main__":
     print("[INFO] Querying upstream data records from live repository...")
