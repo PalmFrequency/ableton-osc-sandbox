@@ -1,36 +1,99 @@
 import json
 import urllib.request
 from datetime import datetime, timezone
+from enum import Enum
 
-# Raw README markdown source URL from the official repository
+# ------------------------------------------------------------------------------------
+# [REQUIRED] Raw README markdown URL from the source repository.
+# ------------------------------------------------------------------------------------
+# This is the primary source of truth for the OSC API registry and is used to
+# dynamically generate the structured JSON schema.
 README_URL = "https://raw.githubusercontent.com/ideoforms/AbletonOSC/master/README.md"
 
-class ParsedAPISection:
+# Enumerations used throughout
+class NoteType(Enum):
+    INFO = "info"
+    WARNING = "warning"
+    ERROR = "error"
+    DEPRECATED = "deprecated"
+    EXPERIMENTAL = "experimental"
+class APIEntryMode(Enum):
+    GET = "get"
+    SET = "set"
+    OBSERVE = "observe"
+    UNOBSERVE = "unobserve"
+
+# Other manually entered metadata about the source repository.
+# Includes a static/persistent list of helpful notes.
+source_repository = "https://github.com/ideoforms/AbletonOSC"
+source_author = "https://github.com/ideoforms"
+source_license = "https://github.com/ideoforms/AbletonOSC?tab=MIT-1-ov-file"
+source_description = "Control Ableton Live via Open Sound Control (OSC)"
+source_min_ableton_version = "11.0"
+source_parsed_markdown: str = README_URL
+source_notes = 
+[
+    {
+        "text":"Ableton Live Object Model (LOM) reference: https://docs.cycling74.com/apiref/lom/",
+        "type": NoteType.INFO.value,
+        "year": "2026",
+        "month": "10",
+        "day": "28",
+        "timezone": timezone.utc
+    }
+]
+
+# Class definitions for structured data representation
+class NoteEntry:
+    # Default constructor for NoteEntry
+    def __init__(self, timestamp: datetime, note_type: NoteType, text: str):
+        self.timestamp = timestamp
+        self.type: NoteType = note_type
+        self.text = text
+    # Alternative constructor for NoteEntry using simlified date string
+    # year must be a 4-digit string, month must be a 2-digit string, day must be 2-digit string
+    # (default timezone is timezone.UTC and default note_type is NoteType.INFO)
+    @classmethod
+    def from_date_string(cls, text: str, year_str: str, month_str: str, day_str: str, timezone: timezone = timezone.utc, note_type: NoteType = NoteType.INFO):
+        timestamp = datetime(int(year_str), int(month_str), int(day_str), tzinfo=timezone.utc)
+        return cls(timestamp, note_type, text)
+
+class SourceMetadata:
+    def __init__(self, repository: str, author: str, license: str, description: str, min_ableton_version: str, 
+                 parsed_markdown: str, notes: list[NoteEntry] = [], last_updated:datetime = datetime.now(timezone.utc)):
+        self.repository = repository
+        self.author = author
+        self.license = license
+        self.description = description
+        self.min_ableton_version = min_ableton_version
+        self.parsed_markdown = parsed_markdown
+        self.notes = notes
+        self.last_updated: datetime = last_updated
+
+class APISection:
     def __init__(self, api_name: str):
         self.api_name = api_name
         self.api_description = ""
-        self.entries: list[ParsedAPIEntry] = []
-        self.timestamp = datetime.now(timezone.utc)
+        self.api_entries: list[APIEntry] = []
 
-
-class ParsedAPIEntry:
+class APIEntry:
     def __init__(
         self, 
-        api_name: str, 
         address: str, 
-        query_params: str, 
-        response: str, 
+        mode: str,
         description: str, 
-        timestamp: datetime
+        query_params: str, 
+        response: str,
+        notes: list[NoteEntry] = []
     ):
-        self.api_name = api_name
         self.address = address
+        self.mode = mode
+        self.description = description
         self.query_params = query_params
         self.response = response
-        self.description = description
-        self.timestamp = timestamp
+        self.notes = notes
 
-    # TOSTRING() ?
+    # Overriding ToString()
     #def __str__(self):
     #    return f"{self.api_name} ({self.address}) - {self.description}"
 
@@ -48,34 +111,36 @@ def parse_markdown_tables(md_content):
     Slices the Markdown file into API sections, dynamically calculates column maps,
     and cleanly extracts structured data records.
     """
-    registry_data = {
-        "source": {
+    api_registry_data = 
+    {
+        "source": 
+        {
             "repository": "https://github.com/ideoforms/AbletonOSC",
             "author": "https://github.com/ideoforms",
             "license": "https://github.com/ideoforms/AbletonOSC?tab=MIT-1-ov-file",
             "description": "Control Ableton Live via Open Sound Control (OSC)",
             "notes": [
                 {
-                    "date": "2026-10-28",
+                    "timestamp": "2026-10-28T17:54:00+00:00",
                     "type": "info",
-                    "note": "mode property vals are \"get\", \"set\", \"observe\", \"unobserve\"."
+                    "text": "mode property vals are \"get\", \"set\", \"observe\", \"unobserve\"."
                 },
                 {
-                    "date": "2026-10-28",
+                    "timestamp": "2026-10-28T17:54:00+00:00",
                     "type": "info",
-                    "note": "min ableton version is 11.0."
+                    "text": "min ableton version is 11.0."
                 },
                 {
-                    "date": "2026-10-28",
+                    "timestamp": "2026-10-28T17:54:00+00:00",
                     "type": "info",
-                    "note": "Ableton Live Object Model (LOM) reference: https://docs.cycling74.com/apiref/lom/"
+                    "text": "Ableton Live Object Model (LOM) reference: https://docs.cycling74.com/apiref/lom/"
                 }
             ],
             "parsed_markdown": README_URL,
-            "schema_version": "1.0.0",
+            "schema_version": "0.1.0",
             "last_updated": datetime.now(timezone.utc).isoformat()
         },
-        "registry": []
+        "api_registry": []
     }
 
     # Regex expression matches headers describing API groups (e.g. "## Application API")
@@ -85,13 +150,13 @@ def parse_markdown_tables(md_content):
     matching_lines:list[str] = extract_from_string(md_content).splitlines()
 
     # Iterate line0by-line to build a list of ParsedOSCEntry objects, dynamically tracking the current API group and table column indices
-    api_sections: list[ParsedAPISection] = []
-    current_api_section: ParsedAPISection | None = None
+    api_sections: list[APISection] = []
+    current_api_section: APISection | None = None
     for line in matching_lines:
         line_str = line.strip()
         if line_str.startswith("## "):
             api_name = line_str.replace("##", "").strip()
-            current_api_section = ParsedAPISection(api_name)
+            current_api_section = APISection(api_name)
             api_sections.append(current_api_section)
         elif line_str.strip() and line_str.strip()[0].isalpha():
             if not api_sections:
@@ -103,13 +168,13 @@ def parse_markdown_tables(md_content):
                 continue  # Skip if no API section has been defined yet
             current_api_section = api_sections[-1]
             cols = [c.strip() for c in line_str.strip("|").split("|")]
-            current_api_section.entries.append(ParsedAPIEntry(
+            current_api_section.api_entries.append(APIEntry(
                 api_name=current_api_section.api_name,
+                mode="get" if "/get/" in cols[0] else "set" if "/set/" in cols[0] else "observe" if "/start_listen/" in cols[0] else "unobserve" if "/stop_listen/" in cols[0] else "get",
                 address=cols[0],
                 query_params=cols[1:2][0] if len(cols[1:2]) > 0 else "",  # Assuming query params are in the second column
                 response=cols[2:3][0] if len(cols[2:3]) > 0 else "",      # Assuming response is in the third column
-                description=cols[3] if len(cols) > 3 else "",
-                timestamp=current_api_section.timestamp
+                description=cols[3] if len(cols) > 3 else ""
             ))
 
     # # Split documentation into blocks corresponding to major headings
