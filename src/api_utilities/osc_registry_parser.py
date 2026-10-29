@@ -6,8 +6,8 @@ from enum import Enum
 # ------------------------------------------------------------------------------------
 # [REQUIRED] Raw README markdown URL from the source repository.
 # ------------------------------------------------------------------------------------
-# This is the primary source of truth for the OSC API registry and is used to
-# dynamically generate the structured JSON schema.
+# This is the primary source of truth for the OSC API registry which is parsed
+# and is used to dynamically generate the structured JSON schema.
 README_URL = "https://raw.githubusercontent.com/ideoforms/AbletonOSC/master/README.md"
 
 # Enumerations used throughout
@@ -23,135 +23,113 @@ class APIEntryMode(Enum):
     OBSERVE = "observe"
     UNOBSERVE = "unobserve"
 
-# Other manually entered metadata about the source repository.
-# Includes a static/persistent list of helpful notes.
-source_repository = "https://github.com/ideoforms/AbletonOSC"
-source_author = "https://github.com/ideoforms"
-source_license = "https://github.com/ideoforms/AbletonOSC?tab=MIT-1-ov-file"
-source_description = "Control Ableton Live via Open Sound Control (OSC)"
-source_min_ableton_version = "11.0"
-source_parsed_markdown: str = README_URL
-source_notes = 
-[
-    {
-        "text":"Ableton Live Object Model (LOM) reference: https://docs.cycling74.com/apiref/lom/",
-        "type": NoteType.INFO.value,
-        "year": "2026",
-        "month": "10",
-        "day": "28",
-        "timezone": timezone.utc
-    }
-]
-
-# Class definitions for structured data representation
+# Class definitions for structured data representation of notes
 class NoteEntry:
     # Default constructor for NoteEntry
-    def __init__(self, timestamp: datetime, note_type: NoteType, text: str):
-        self.timestamp = timestamp
-        self.type: NoteType = note_type
+    def __init__(self, note_type: NoteType, text: str, timestamp: datetime):
+        self.note_type: NoteType = note_type
         self.text = text
-    # Alternative constructor for NoteEntry using simlified date string
-    # year must be a 4-digit string, month must be a 2-digit string, day must be 2-digit string
-    # (default timezone is timezone.UTC and default note_type is NoteType.INFO)
+        self.timestamp = timestamp
+    # Alt constructor to create from a timestamp string with timezone awareness (default is UTC).
+    # timestamp_str should be "YYYY-MM-DD" (e.g., "2026-10-28")
     @classmethod
-    def from_date_string(cls, text: str, year_str: str, month_str: str, day_str: str, timezone: timezone = timezone.utc, note_type: NoteType = NoteType.INFO):
-        timestamp = datetime(int(year_str), int(month_str), int(day_str), tzinfo=timezone.utc)
-        return cls(timestamp, note_type, text)
+    def from_timestamp_str(cls, note_type: NoteType, text: str, timestamp_str: str, timezone: timezone = timezone.utc):
+        try:
+            timestamp = datetime.fromisoformat(timestamp_str).replace(tzinfo=timezone)
+            return cls(note_type, text, timestamp)
+        except ValueError as e:
+            print(f"[ERROR] Invalid timestamp format: {timestamp_str}. Expected 'YYYY-MM-DD'. Error: {e}")
+            return cls(note_type, text, datetime.now(timezone))
+
+# ------------------------------------------------------------------------------------
+# [OPTIONAL] (but recommended) Metadata about the source repository and documentation.
+# ------------------------------------------------------------------------------------
+# Other manually entered metadata about the source repository.Includes a
+# static/persistent list of helpful notes along with the date they were added.
+SOURCE_REPOSITORY = "https://github.com/ideoforms/AbletonOSC"
+SOURCE_AUTHOR = "https://github.com/ideoforms"
+SOURCE_LICENSE = "https://github.com/ideoforms/AbletonOSC?tab=MIT-1-ov-file"
+SOURCE_DESCRIPTION = "Control Ableton Live via Open Sound Control (OSC)"
+SOURCE_MIN_ABLETON_VERSION = "11.0"
+SOURCE_PARSED_MARKDOWN: str|None = README_URL # REQUIRED VALUE!
+# Maintain static list of helpful notes about the overall API to include
+# in the registry
+SOURCE_NOTES: list[NoteEntry] = [
+    NoteEntry.from_timestamp_str(NoteType.INFO, "Ableton Live Object Model (LOM) reference: https://docs.cycling74.com/apiref/lom/", "2026-10-28"),
+]
+
+# Class describes beginning metadata about the source repository and documentation,
+# generated from manually entered values and the README URL. This is used to provide
+# context for the API registry.
 
 class SourceMetadata:
-    def __init__(self, repository: str, author: str, license: str, description: str, min_ableton_version: str, 
-                 parsed_markdown: str, notes: list[NoteEntry] = [], last_updated:datetime = datetime.now(timezone.utc)):
-        self.repository = repository
-        self.author = author
-        self.license = license
-        self.description = description
-        self.min_ableton_version = min_ableton_version
-        self.parsed_markdown = parsed_markdown
-        self.notes = notes
+    def __init__(self, repository: str = SOURCE_REPOSITORY, author: str = SOURCE_AUTHOR, license: str = SOURCE_LICENSE, 
+                 description: str = SOURCE_DESCRIPTION, min_ableton_version: str = SOURCE_MIN_ABLETON_VERSION, 
+                 parsed_markdown:str|None = README_URL, notes: list[NoteEntry] = SOURCE_NOTES, 
+                 last_updated:datetime = datetime.now(timezone.utc)):
+        if parsed_markdown is None or not parsed_markdown.strip():
+            raise ValueError("[ERROR] Initialization failed: 'parsed_markdown' (AKA README URL) cannot be None, empty, or blank.")
+        self.repository:str = repository.strip()
+        self.author:str = author.strip()
+        self.license:str = license.strip()
+        self.description:str = description.strip()
+        self.min_ableton_version:str = min_ableton_version.strip()
+        self.parsed_markdown:str = parsed_markdown.strip()
+        self.notes:list[NoteEntry] = notes
         self.last_updated: datetime = last_updated
 
 class APISection:
-    def __init__(self, api_name: str):
-        self.api_name = api_name
-        self.api_description = ""
+    def __init__(self, api_name: str, api_description: str = "" ):
+        self.api_name = api_name.strip()
+        self.api_description:str = api_description.strip()
         self.api_entries: list[APIEntry] = []
+    @classmethod
+    def as_empty_obj(cls):
+        return cls("")
 
 class APIEntry:
-    def __init__(
-        self, 
-        address: str, 
-        mode: str,
-        description: str, 
-        query_params: str, 
-        response: str,
-        notes: list[NoteEntry] = []
-    ):
+    def __init__(self, address: str, mode: str, description: str, query_params: str, response: str, notes:list[NoteEntry]):
         self.address = address
         self.mode = mode
         self.description = description
         self.query_params = query_params
         self.response = response
-        self.notes = notes
+        self.notes: list[NoteEntry] = notes
 
-    # Overriding ToString()
-    #def __str__(self):
-    #    return f"{self.api_name} ({self.address}) - {self.description}"
+class APIRegistry:
+    def __init__(self, source_metadata:SourceMetadata):
+        self.api_source:SourceMetadata = source_metadata
+        self.api_sections:list[APISection] = []
 
-def fetch_raw_readme(url=README_URL):
-    """Fetches the latest raw Markdown text from the upstream repository."""
+
+# Fetches the latest raw Markdown text from the upstream repository
+# for processing as md_content.
+def fetch_raw_readme(url:str = README_URL):
     try:
-        with urllib.request.urlopen(url, timeout=10) as response:
+        with urllib.request.urlopen(url, timeout = 10) as response:
             return response.read().decode('utf-8')
     except Exception as e:
-        print(f"[ERROR] Failed to fetch upstream documentation: {e}")
+        print(f"[ERROR] Failed to fetch upstream documentation which is the source of the API: {e}")
         return None
 
+# Slices the Markdown file into API sections, dynamically calculates column maps,
+# and cleanly extracts structured data records.
 def parse_markdown_tables(md_content):
-    """
-    Slices the Markdown file into API sections, dynamically calculates column maps,
-    and cleanly extracts structured data records.
-    """
-    api_registry_data = 
-    {
-        "source": 
-        {
-            "repository": "https://github.com/ideoforms/AbletonOSC",
-            "author": "https://github.com/ideoforms",
-            "license": "https://github.com/ideoforms/AbletonOSC?tab=MIT-1-ov-file",
-            "description": "Control Ableton Live via Open Sound Control (OSC)",
-            "notes": [
-                {
-                    "timestamp": "2026-10-28T17:54:00+00:00",
-                    "type": "info",
-                    "text": "mode property vals are \"get\", \"set\", \"observe\", \"unobserve\"."
-                },
-                {
-                    "timestamp": "2026-10-28T17:54:00+00:00",
-                    "type": "info",
-                    "text": "min ableton version is 11.0."
-                },
-                {
-                    "timestamp": "2026-10-28T17:54:00+00:00",
-                    "type": "info",
-                    "text": "Ableton Live Object Model (LOM) reference: https://docs.cycling74.com/apiref/lom/"
-                }
-            ],
-            "parsed_markdown": README_URL,
-            "schema_version": "0.1.0",
-            "last_updated": datetime.now(timezone.utc).isoformat()
-        },
-        "api_registry": []
-    }
-
+    # 1. Build registry container and add the API source/metadata section
+    # ------------------------------------------------------------------------------------
+    api_registry:APIRegistry = APIRegistry(source_metadata = SourceMetadata())
+    
+    # 2. Intermediate parsing/processing of the API doc markdown
+    # ------------------------------------------------------------------------------------
     # Regex expression matches headers describing API groups (e.g. "## Application API")
     # and lines starting with the OSC address prefix (e.g. "| /live/..."). Each processed
     # address prefix will be associated with the last API group header encountered in the 
     # Markdown file.
-    matching_lines:list[str] = extract_from_string(md_content).splitlines()
+    matching_lines:list[str] = extract_from_string(text_content = md_content).splitlines()
 
-    # Iterate line0by-line to build a list of ParsedOSCEntry objects, dynamically tracking the current API group and table column indices
-    api_sections: list[APISection] = []
-    current_api_section: APISection | None = None
+    # Iterate line-by-line to build a list of APIEntry objects, dynamically tracking the current API group and metadata
+    api_sections:list[APISection] = api_registry.api_sections
+
     for line in matching_lines:
         line_str = line.strip()
         if line_str.startswith("## "):
@@ -161,21 +139,60 @@ def parse_markdown_tables(md_content):
         elif line_str.strip() and line_str.strip()[0].isalpha():
             if not api_sections:
                 continue  # Skip if no API section has been defined yet
+            # Access last (current) API Section and associate the description info
             current_api_section = api_sections[-1]
             current_api_section.api_description += line_str + " "
         elif line_str.startswith("| /live/"):
             if not api_sections:
                 continue  # Skip if no API section has been defined yet
+            # Access last (current) API Section and associate the address/path info (the method)
             current_api_section = api_sections[-1]
             cols = [c.strip() for c in line_str.strip("|").split("|")]
             current_api_section.api_entries.append(APIEntry(
-                api_name=current_api_section.api_name,
-                mode="get" if "/get/" in cols[0] else "set" if "/set/" in cols[0] else "observe" if "/start_listen/" in cols[0] else "unobserve" if "/stop_listen/" in cols[0] else "get",
-                address=cols[0],
-                query_params=cols[1:2][0] if len(cols[1:2]) > 0 else "",  # Assuming query params are in the second column
-                response=cols[2:3][0] if len(cols[2:3]) > 0 else "",      # Assuming response is in the third column
-                description=cols[3] if len(cols) > 3 else ""
+                address = cols[0],
+                mode = "get" if "/get/" in cols[0] 
+                    else "set" if "/set/" in cols[0] 
+                    else "observe" if "/start_listen/" in cols[0] 
+                    else "unobserve" if "/stop_listen/" in cols[0] 
+                    else "get",
+                description = cols[3] if len(cols) > 3 
+                    else "",
+                query_params = cols[1:2][0] if len(cols[1:2]) > 0 
+                    else "",  # Assuming query params are in the second column
+                response = cols[2:3][0] if len(cols[2:3]) > 0 
+                    else "",      # Assuming response is in the third column
+                notes = [] # For possible future use
             ))
+
+    return api_registry
+
+    # # Iterate line0by-line to build a list of ParsedOSCEntry objects, dynamically tracking the current API group and table column indices
+    # api_sections: list[APISection] = []
+    # current_api_section: APISection | None = None
+    # for line in matching_lines:
+    #     line_str = line.strip()
+    #     if line_str.startswith("## "):
+    #         api_name = line_str.replace("##", "").strip()
+    #         current_api_section = APISection(api_name)
+    #         api_sections.append(current_api_section)
+    #     elif line_str.strip() and line_str.strip()[0].isalpha():
+    #         if not api_sections:
+    #             continue  # Skip if no API section has been defined yet
+    #         current_api_section = api_sections[-1]
+    #         current_api_section.api_description += line_str + " "
+    #     elif line_str.startswith("| /live/"):
+    #         if not api_sections:
+    #             continue  # Skip if no API section has been defined yet
+    #         current_api_section = api_sections[-1]
+    #         cols = [c.strip() for c in line_str.strip("|").split("|")]
+    #         current_api_section.api_entries.append(APIEntry(
+    #             api_name=current_api_section.api_name,
+    #             mode="get" if "/get/" in cols[0] else "set" if "/set/" in cols[0] else "observe" if "/start_listen/" in cols[0] else "unobserve" if "/stop_listen/" in cols[0] else "get",
+    #             address=cols[0],
+    #             query_params=cols[1:2][0] if len(cols[1:2]) > 0 else "",  # Assuming query params are in the second column
+    #             response=cols[2:3][0] if len(cols[2:3]) > 0 else "",      # Assuming response is in the third column
+    #             description=cols[3] if len(cols) > 3 else ""
+    #         ))
 
     # # Split documentation into blocks corresponding to major headings
     # #sections = re.findall(r'(##\s+.*?API.*?)\n(.*?)(?=\n##|$)', md_content, re.DOTALL)
@@ -212,7 +229,9 @@ def parse_markdown_tables(md_content):
     #             entry = handle_edge_cases(address, api_group, cols, current_col_map)
     #             registry_data["registry"].append(entry)
             
-    return registry_data
+    # return registry_data
+
+    # STOPPED HERE------------------------------------------------------------------------------------------------
 
 # Parse the README content to extract only the relevant lines for processing
 def extract_from_string(text_content: str) -> str:

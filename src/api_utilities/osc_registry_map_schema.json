@@ -1,5 +1,5 @@
 {
-    "source": 
+    "api_source": 
     {
         "repository":"https://github.com/ideoforms/AbletonOSC",
         "author": "https://github.com/ideoforms",
@@ -8,15 +8,15 @@
         "min_ableton_version": "11.0",
         "notes":[
             {
-                "timestamp": "2026-10-28T17:54:00+00:00",
                 "type": "info",
-                "text": "Ableton Live Object Model (LOM) reference: https://docs.cycling74.com/apiref/lom/"
+                "text": "Ableton Live Object Model (LOM) reference: https://docs.cycling74.com/apiref/lom/",
+                "timestamp": "2026-10-28T17:54:00+00:00"
             }
         ],
         "parsed_markdown": "https://raw.githubusercontent.com/ideoforms/AbletonOSC/master/README.md",
         "last_updated": "2026-10-28T17:54:00+00:00"
     },
-    "api_registry":
+    "api_sections":
     [
         {
             "api_name": "Application API",
