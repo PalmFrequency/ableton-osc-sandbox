@@ -1,10 +1,11 @@
 import json
 import urllib.request
+from typing import Any
 from datetime import datetime, timezone
 from enum import Enum
 
 # ------------------------------------------------------------------------------------
-# [REQUIRED] Raw README markdown URL from the source repository.
+# [REQUIRED] Raw README markdown URL from the source repository for Ableton-OSC.
 # ------------------------------------------------------------------------------------
 # This is the primary source of truth for the OSC API registry which is parsed
 # and is used to dynamically generate the structured JSON schema.
@@ -28,18 +29,18 @@ class NoteEntry:
     # Default constructor for NoteEntry
     def __init__(self, note_type: NoteType, text: str, timestamp: datetime):
         self.note_type: NoteType = note_type
-        self.text = text
-        self.timestamp = timestamp
-    # Alt constructor to create from a timestamp string with timezone awareness (default is UTC).
-    # timestamp_str should be "YYYY-MM-DD" (e.g., "2026-10-28")
+        self.text: str = text
+        self.timestamp: datetime = timestamp
+    # Alt constructor to create from a timestamp string with timezone (default is UTC).
+    # timestamp_str format should be "YYYY-MM-DD" (e.g., "2026-10-28")
     @classmethod
     def from_timestamp_str(cls, note_type: NoteType, text: str, timestamp_str: str, timezone: timezone = timezone.utc):
         try:
-            timestamp = datetime.fromisoformat(timestamp_str).replace(tzinfo=timezone)
+            timestamp: datetime = datetime.fromisoformat(timestamp_str).replace(tzinfo=timezone)
             return cls(note_type, text, timestamp)
         except ValueError as e:
             print(f"[ERROR] Invalid timestamp format: {timestamp_str}. Expected 'YYYY-MM-DD'. Error: {e}")
-            return cls(note_type, text, datetime.now(timezone))
+            return cls(note_type, text, timestamp = datetime.now(tz = timezone))
 
 # ------------------------------------------------------------------------------------
 # [OPTIONAL] (but recommended) Metadata about the source repository and documentation.
@@ -55,18 +56,22 @@ SOURCE_PARSED_MARKDOWN: str|None = README_URL # REQUIRED VALUE!
 # Maintain static list of helpful notes about the overall API to include
 # in the registry
 SOURCE_NOTES: list[NoteEntry] = [
-    NoteEntry.from_timestamp_str(NoteType.INFO, "Ableton Live Object Model (LOM) reference: https://docs.cycling74.com/apiref/lom/", "2026-10-28"),
+    NoteEntry.from_timestamp_str(note_type = NoteType.INFO, 
+                                 text = "Ableton Live Object Model (LOM) reference: https://docs.cycling74.com/apiref/lom/",
+                                 timestamp_str = "2026-10-28"),
+    NoteEntry.from_timestamp_str(note_type = NoteType.INFO, 
+                                     text = "Source code to create this registry: https://github.com/PalmFrequency/ableton-osc-sandbox/blob/main/src/api_utilities/osc_registry_parser.py",
+                                     timestamp_str = "2026-10-30")
 ]
 
-# Class describes beginning metadata about the source repository and documentation,
-# generated from manually entered values and the README URL. This is used to provide
-# context for the API registry.
-
+# Class describes metadata about the source repository and documentation,
+# generated from manually entered values and the README URL. This info is 
+# used to provide context for the API registry.
 class SourceMetadata:
     def __init__(self, repository: str = SOURCE_REPOSITORY, author: str = SOURCE_AUTHOR, license: str = SOURCE_LICENSE, 
                  description: str = SOURCE_DESCRIPTION, min_ableton_version: str = SOURCE_MIN_ABLETON_VERSION, 
                  parsed_markdown:str|None = README_URL, notes: list[NoteEntry] = SOURCE_NOTES, 
-                 last_updated:datetime = datetime.now(timezone.utc)):
+                 last_updated:datetime = datetime.now(tz = timezone.utc)):
         if parsed_markdown is None or not parsed_markdown.strip():
             raise ValueError("[ERROR] Initialization failed: 'parsed_markdown' (AKA README URL) cannot be None, empty, or blank.")
         self.repository:str = repository.strip()
@@ -85,15 +90,15 @@ class APISection:
         self.api_entries: list[APIEntry] = []
     @classmethod
     def as_empty_obj(cls):
-        return cls("")
+        return cls(api_name = "")
 
 class APIEntry:
     def __init__(self, address: str, mode: str, description: str, query_params: str, response: str, notes:list[NoteEntry]):
-        self.address = address
-        self.mode = mode
-        self.description = description
-        self.query_params = query_params
-        self.response = response
+        self.address: str = address
+        self.mode: str = mode
+        self.description: str = description
+        self.query_params: str = query_params
+        self.response: str = response
         self.notes: list[NoteEntry] = notes
 
 class APIRegistry:
@@ -131,23 +136,23 @@ def parse_markdown_tables(md_content):
     api_sections:list[APISection] = api_registry.api_sections
 
     for line in matching_lines:
-        line_str = line.strip()
+        line_str: str = line.strip()
         if line_str.startswith("## "):
-            api_name = line_str.replace("##", "").strip()
+            api_name: str = line_str.replace("##", "").strip()
             current_api_section = APISection(api_name)
             api_sections.append(current_api_section)
         elif line_str.strip() and line_str.strip()[0].isalpha():
             if not api_sections:
                 continue  # Skip if no API section has been defined yet
             # Access last (current) API Section and associate the description info
-            current_api_section = api_sections[-1]
+            current_api_section: APISection = api_sections[-1]
             current_api_section.api_description += line_str + " "
         elif line_str.startswith("| /live/"):
             if not api_sections:
                 continue  # Skip if no API section has been defined yet
             # Access last (current) API Section and associate the address/path info (the method)
-            current_api_section = api_sections[-1]
-            cols = [c.strip() for c in line_str.strip("|").split("|")]
+            current_api_section: APISection = api_sections[-1]
+            cols: list[str] = [c.strip() for c in line_str.strip("|").split(sep = "|")]
             current_api_section.api_entries.append(APIEntry(
                 address = cols[0],
                 mode = "get" if "/get/" in cols[0] 
@@ -166,78 +171,12 @@ def parse_markdown_tables(md_content):
 
     return api_registry
 
-    # # Iterate line0by-line to build a list of ParsedOSCEntry objects, dynamically tracking the current API group and table column indices
-    # api_sections: list[APISection] = []
-    # current_api_section: APISection | None = None
-    # for line in matching_lines:
-    #     line_str = line.strip()
-    #     if line_str.startswith("## "):
-    #         api_name = line_str.replace("##", "").strip()
-    #         current_api_section = APISection(api_name)
-    #         api_sections.append(current_api_section)
-    #     elif line_str.strip() and line_str.strip()[0].isalpha():
-    #         if not api_sections:
-    #             continue  # Skip if no API section has been defined yet
-    #         current_api_section = api_sections[-1]
-    #         current_api_section.api_description += line_str + " "
-    #     elif line_str.startswith("| /live/"):
-    #         if not api_sections:
-    #             continue  # Skip if no API section has been defined yet
-    #         current_api_section = api_sections[-1]
-    #         cols = [c.strip() for c in line_str.strip("|").split("|")]
-    #         current_api_section.api_entries.append(APIEntry(
-    #             api_name=current_api_section.api_name,
-    #             mode="get" if "/get/" in cols[0] else "set" if "/set/" in cols[0] else "observe" if "/start_listen/" in cols[0] else "unobserve" if "/stop_listen/" in cols[0] else "get",
-    #             address=cols[0],
-    #             query_params=cols[1:2][0] if len(cols[1:2]) > 0 else "",  # Assuming query params are in the second column
-    #             response=cols[2:3][0] if len(cols[2:3]) > 0 else "",      # Assuming response is in the third column
-    #             description=cols[3] if len(cols) > 3 else ""
-    #         ))
-
-    # # Split documentation into blocks corresponding to major headings
-    # #sections = re.findall(r'(##\s+.*?API.*?)\n(.*?)(?=\n##|$)', md_content, re.DOTALL)
-
-    # for sec_title, sec_body in sections:
-    #     api_group = sec_title.replace("##", "").strip()
-        
-    #     # Track the active table columns dynamically within this section block
-    #     current_col_map = {"query": None, "response": None, "desc": None}
-        
-    #     for line in sec_body.splitlines():
-    #         line_str = line.strip()
-            
-    #         # Heuristic: Detect the table header line to build a dynamic column blueprint
-    #         if "Address" in line_str and "|" in line_str:
-    #             header_cols = [c.strip().lower() for c in line_str.strip("|").split("|")]
-    #             current_col_map = {
-    #                 "query": next((i for i, h in enumerate(header_cols) if "query" in h), None),
-    #                 "response": next((i for i, h in enumerate(header_cols) if "response" in h), None),
-    #                 "desc": next((i for i, h in enumerate(header_cols) if "desc" in h), None)
-    #             }
-    #             continue
-
-    #         # Process valid OSC API string payload values
-    #         if "/live/" in line_str and "|" in line_str:
-    #             raw_cols = line_str.strip("|").split("|")
-    #             cols = [c.strip() for c in raw_cols]
-                
-    #             address = cols[0]
-    #             if address.startswith("-") or not address.startswith("/live/"):
-    #                 continue
-                
-    #             # Run the aligned mapping through the edge case normalizer
-    #             entry = handle_edge_cases(address, api_group, cols, current_col_map)
-    #             registry_data["registry"].append(entry)
-            
-    # return registry_data
-
-    # STOPPED HERE------------------------------------------------------------------------------------------------
 
 # Parse the README content to extract only the relevant lines for processing
 def extract_from_string(text_content: str) -> str:
-    selected_lines = []
+    selected_lines: list [str | Any] = []
     capture_block = False
-    block_buffer = []
+    block_buffer: list[Any] = []
 
     # splitlines() handles \n, \r\n, and keeps line formatting clean
     for line in text_content.splitlines(keepends=True):
@@ -246,12 +185,12 @@ def extract_from_string(text_content: str) -> str:
 
         elif line.startswith("## "):
             capture_block = True
-            block_buffer = [line]
+            block_buffer: list[Any] = [line]
 
         elif capture_block:
             if "<details>" in line:
                 selected_lines.extend(block_buffer)
-                block_buffer = []
+                block_buffer: list[Any] = []
                 capture_block = False
             else:
                 block_buffer.append(line)
@@ -263,22 +202,11 @@ def extract_from_string(text_content: str) -> str:
 #     """
 #     Interceptor layer that aligns indices via headers and formats clean schemas.
 #     """
-#     today_str = datetime.today().strftime('%Y-%m-%d')
     
 #     # Safely align variables using the verified column map positions
 #     raw_query = cols[col_map["query"]] if col_map["query"] is not None and col_map["query"] < len(cols) else ""
 #     raw_resp = cols[col_map["response"]] if col_map["response"] is not None and col_map["response"] < len(cols) else ""
 #     description = cols[col_map["desc"]] if col_map["desc"] is not None and col_map["desc"] < len(cols) else ""
-
-#     # Mode type classifications
-#     if "/set/" in address:
-#         mode = "set"
-#     elif "/start_listen/" in address:
-#         mode = "observe"
-#     elif "/stop_listen/" in address:
-#         mode = "unobserve"
-#     else:
-#         mode = "get"
 
 #     entry = {
 #         "address": address,
@@ -347,14 +275,15 @@ def extract_from_string(text_content: str) -> str:
 
 if __name__ == "__main__":
     print("[INFO] Querying upstream data records from live repository...")
-    md_content = fetch_raw_readme()
+    md_content: Any = fetch_raw_readme()
     
     if md_content:
-        print("[INFO] Resolving tables using adaptive column header indexation...")
-        structured_json = parse_markdown_tables(md_content)
-        
+        print("[INFO] Extracting API from markdown docs as structured data...")
+        structured_json: Any = parse_markdown_tables(md_content)
+
+        # Format and save as local JSON file
         output_path = "ableton_osc_registry.json"
-        with open(output_path, "w", encoding="utf-8") as f:
-            json.dump(structured_json, f, indent=4, ensure_ascii=False)
+        with open(file = output_path, mode = "w", encoding = "utf-8") as f:
+            json.dump(obj = structured_json, fp = f, indent = 4, ensure_ascii = False)
             
         print(f"[SUCCESS] Correctly mapped and outputted {len(structured_json['registry'])} robust schemas to '{output_path}'.")
