@@ -20,12 +20,16 @@ README_URL = "https://raw.githubusercontent.com/ideoforms/AbletonOSC/master/READ
 # This is the primary source of truth for the OSC API registry which is parsed
 # and is used to dynamically generate the structured JSON schema.
 
+# ---------------------------------------
+
 # [OPTIONAL]
 SOURCE_REPOSITORY = "https://github.com/ideoforms/AbletonOSC"
 SOURCE_AUTHOR = "https://github.com/ideoforms"
 SOURCE_LICENSE = "https://github.com/ideoforms/AbletonOSC?tab=MIT-1-ov-file"
 SOURCE_DESCRIPTION = "Control Ableton Live via Open Sound Control (OSC)"
 SOURCE_MIN_ABLETON_VERSION = "11.0"
+
+
 
 # ------------------------------------------------------------------------------------
 # Enumerations
@@ -38,17 +42,20 @@ class NoteType(Enum):
     DEPRECATED = "deprecated"
     EXPERIMENTAL = "experimental"
 
+# ---------------------------------------
+
 class APIEntryMode(Enum):
     GET = "get"
     SET = "set"
     OBSERVE = "observe"
     UNOBSERVE = "unobserve"
 
+
+
 # ------------------------------------------------------------------------------------
 # Data Model with custom two-way contracts to enable JSON-based de-/serialization.
 # (serialize-to_dict(), deserialize-from_dict())
 # ------------------------------------------------------------------------------------
-
 
 # Class definitions for structured data representation of notes
 # described throughout the API/regisry resource
@@ -104,7 +111,7 @@ SOURCE_NOTES: list[NoteEntry] = [
                                      timestamp_str = "2026-10-30")
 ]
 
-
+# ---------------------------------------
 
 # Class describes metadata about the source repository and documentation,
 # generated from manually entered values and the README URL. This info is 
@@ -159,8 +166,7 @@ class SourceMetadata:
             last_updated = datetime.fromisoformat(data["last_updated"])
         )
 
-
-
+# ---------------------------------------
 
 # Class describes each individual Ableton-OSC API methods
 # under each API section as described by the parsed source documentation
@@ -202,7 +208,7 @@ class APIEntry:
             notes = [NoteEntry.from_dict(data = d) for d in data.get("notes", [])]
         )
 
-
+# ---------------------------------------
 
 # Class describes each individual Ableton-OSC API group/type
 # and serves as a container for all methods that fall under
@@ -241,7 +247,7 @@ class APISection:
         return section
 
 
-
+# ---------------------------------------
 
 # Class describes outermost data structure encapsulating all info 
 # describing Ableton-OSC API metadata, sections, and methods
@@ -256,27 +262,29 @@ class APIRegistry:
     # it requires access to instance properties.
     def to_dict(self) -> dict:
         return {
-            "api_name": self.api_name,
-            "api_description": self.api_description,
-            "api_entries": [entry.to_dict() for entry in self.api_entries]
+            "api_source": self.api_source.to_dict(),
+            "api_sections": [section.to_dict() for section in self.api_sections]
         }
 
-    # DESERIALIZE dict instance into native APISection object
-    # instance and properties. Notes: Returns a APISection object 
+    # DESERIALIZE dict instance into native APIRegistry object
+    # instance and properties. Notes: Returns a APIRegistry object 
     # (enforced in Python as a "suggestion"). Decorated with @classmethod because
     # it accesses the class definition
     @classmethod
-    def from_dict(cls, data: dict) -> "APISection":
-        section = cls(
-            api_name = data["api_name"],
-            api_description = data["api_description"]
-        )
-        section.api_entries= [APIEntry.from_dict(data = d) for d in data.get("api_entries", [])]
-        return section
+    def from_dict(cls, data: dict) -> "APIRegistry":
+        registry = cls(source_metadata = SourceMetadata.from_dict(data["api_source"]))
+        registry.api_sections = [APISection.from_dict(data = d) for d in data.get("api_sections", [])]
+        return registry
 
 
-# Fetches the latest raw Markdown text from the upstream repository
-# for processing as md_content.
+
+
+
+# ------------------------------------------------------------------------------------
+# Extraction methods
+# ------------------------------------------------------------------------------------
+
+# Download the latest raw markdown text from the upstream repository for processing.
 def fetch_raw_readme(url:str = README_URL):
     try:
         with urllib.request.urlopen(url, timeout = 10) as response:
@@ -285,22 +293,46 @@ def fetch_raw_readme(url:str = README_URL):
         print(f"[ERROR] Failed to fetch upstream documentation which is the source of the API: {e}")
         return None
 
+# ---------------------------------------
+
+# Parse the markdow content to extract only the relevant lines for processing
+def extract_from_string(text_content: str) -> str:
+    selected_lines: list [str | Any] = []
+    capture_block = False
+    block_buffer: list[Any] = []
+
+    # splitlines() handles \n, \r\n, and keeps line formatting clean
+    for line in text_content.splitlines(keepends=True):
+        if line.startswith("| /live/"):
+            selected_lines.append(line)
+
+        elif line.startswith("## "):
+            capture_block = True
+            block_buffer: list[Any] = [line]
+
+        elif capture_block:
+            if "<details>" in line:
+                selected_lines.extend(block_buffer)
+                block_buffer: list[Any] = []
+                capture_block = False
+            else:
+                block_buffer.append(line)
+
+    return "".join(selected_lines)
+
+# ---------------------------------------
+
 # Slices the Markdown file into API sections, dynamically calculates column maps,
 # and cleanly extracts structured data records.
 def parse_markdown_tables(md_content):
-    # 1. Build registry container and add the API source/metadata section
-    # ------------------------------------------------------------------------------------
+    # Create registry container and add the API source/metadata section
     api_registry:APIRegistry = APIRegistry(source_metadata = SourceMetadata())
     
-    # 2. Intermediate parsing/processing of the API doc markdown
-    # ------------------------------------------------------------------------------------
-    # Regex expression matches headers describing API groups (e.g. "## Application API")
-    # and lines starting with the OSC address prefix (e.g. "| /live/..."). Each processed
-    # address prefix will be associated with the last API group header encountered in the 
-    # Markdown file.
+    # Intermediate parsing/processing of the API doc markdown.
     matching_lines:list[str] = extract_from_string(text_content = md_content).splitlines()
 
-    # Iterate line-by-line to build a list of APIEntry objects, dynamically tracking the current API group and metadata
+    # Iterate line-by-line to build a list of APIEntry objects, dynamically 
+    # tracking the current API group and metadata
     api_sections:list[APISection] = api_registry.api_sections
 
     for line in matching_lines:
@@ -338,32 +370,6 @@ def parse_markdown_tables(md_content):
             ))
 
     return api_registry
-
-
-# Parse the README content to extract only the relevant lines for processing
-def extract_from_string(text_content: str) -> str:
-    selected_lines: list [str | Any] = []
-    capture_block = False
-    block_buffer: list[Any] = []
-
-    # splitlines() handles \n, \r\n, and keeps line formatting clean
-    for line in text_content.splitlines(keepends=True):
-        if line.startswith("| /live/"):
-            selected_lines.append(line)
-
-        elif line.startswith("## "):
-            capture_block = True
-            block_buffer: list[Any] = [line]
-
-        elif capture_block:
-            if "<details>" in line:
-                selected_lines.extend(block_buffer)
-                block_buffer: list[Any] = []
-                capture_block = False
-            else:
-                block_buffer.append(line)
-
-    return "".join(selected_lines)
 
 
 # def handle_edge_cases(address, api_group, cols, col_map):
@@ -440,6 +446,8 @@ def extract_from_string(text_content: str) -> str:
 
 #     return entry
 
+
+############################################# STOP HERE 10/31/2026 12:10PM
 
 if __name__ == "__main__":
     print("[INFO] Querying upstream data records from live repository...")
