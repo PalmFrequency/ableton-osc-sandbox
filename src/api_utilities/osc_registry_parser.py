@@ -4,33 +4,61 @@ from typing import Any
 from datetime import datetime, timezone
 from enum import Enum
 
+
+##################################
+# REMINDERS/TODO
+# Run mypy to flag/catch issues before "releases" (10/31/2026)
+##################################
+
+
 # ------------------------------------------------------------------------------------
+# Globals
+# ------------------------------------------------------------------------------------
+
 # [REQUIRED] Raw README markdown URL from the source repository for Ableton-OSC.
-# ------------------------------------------------------------------------------------
+README_URL = "https://raw.githubusercontent.com/ideoforms/AbletonOSC/master/README.md"
 # This is the primary source of truth for the OSC API registry which is parsed
 # and is used to dynamically generate the structured JSON schema.
-README_URL = "https://raw.githubusercontent.com/ideoforms/AbletonOSC/master/README.md"
 
-# Enumerations used throughout
+# [OPTIONAL]
+SOURCE_REPOSITORY = "https://github.com/ideoforms/AbletonOSC"
+SOURCE_AUTHOR = "https://github.com/ideoforms"
+SOURCE_LICENSE = "https://github.com/ideoforms/AbletonOSC?tab=MIT-1-ov-file"
+SOURCE_DESCRIPTION = "Control Ableton Live via Open Sound Control (OSC)"
+SOURCE_MIN_ABLETON_VERSION = "11.0"
+
+# ------------------------------------------------------------------------------------
+# Enumerations
+# ------------------------------------------------------------------------------------
+
 class NoteType(Enum):
     INFO = "info"
     WARNING = "warning"
     ERROR = "error"
     DEPRECATED = "deprecated"
     EXPERIMENTAL = "experimental"
+
 class APIEntryMode(Enum):
     GET = "get"
     SET = "set"
     OBSERVE = "observe"
     UNOBSERVE = "unobserve"
 
+# ------------------------------------------------------------------------------------
+# Data Model with custom two-way contracts to enable JSON-based de-/serialization.
+# (serialize-to_dict(), deserialize-from_dict())
+# ------------------------------------------------------------------------------------
+
+
 # Class definitions for structured data representation of notes
+# described throughout the API/regisry resource
 class NoteEntry:
     # Default constructor for NoteEntry
     def __init__(self, note_type: NoteType, text: str, timestamp: datetime):
         self.note_type: NoteType = note_type
         self.text: str = text
         self.timestamp: datetime = timestamp
+
     # Alt constructor to create from a timestamp string with timezone (default is UTC).
     # timestamp_str format should be "YYYY-MM-DD" (e.g., "2026-10-28")
     @classmethod
@@ -42,19 +70,31 @@ class NoteEntry:
             print(f"[ERROR] Invalid timestamp format: {timestamp_str}. Expected 'YYYY-MM-DD'. Error: {e}")
             return cls(note_type, text, timestamp = datetime.now(tz = timezone))
 
-# ------------------------------------------------------------------------------------
-# [OPTIONAL] (but recommended) Metadata about the source repository and documentation.
-# ------------------------------------------------------------------------------------
-# Other manually entered metadata about the source repository.Includes a
-# static/persistent list of helpful notes along with the date they were added.
-SOURCE_REPOSITORY = "https://github.com/ideoforms/AbletonOSC"
-SOURCE_AUTHOR = "https://github.com/ideoforms"
-SOURCE_LICENSE = "https://github.com/ideoforms/AbletonOSC?tab=MIT-1-ov-file"
-SOURCE_DESCRIPTION = "Control Ableton Live via Open Sound Control (OSC)"
-SOURCE_MIN_ABLETON_VERSION = "11.0"
-SOURCE_PARSED_MARKDOWN: str|None = README_URL # REQUIRED VALUE!
-# Maintain static list of helpful notes about the overall API to include
-# in the registry
+    # SERIALIZE NoteEntry instance into standard JSON types.
+    # Notes: Returns a dict object (enforced in Python as 
+    # a "suggestion"). Not decorated with @classmethod because 
+    # it requires access to instance properties.
+    def to_dict(self) -> dict:
+        return {
+            "note_type" : self.note_type.value,
+            "text" : self.text,
+            "timestamp" : self.timestamp.isoformat()
+        }
+
+    # DESERIALIZE dict instance into native NoteEntry object
+    # instance and properties. Notes: Returns a NoteEntry object 
+    # (enforced in Python as a "suggestion"). Decorated with @classmethod because
+    # it accesses the class definition
+    @classmethod
+    def from_dict(cls, data: dict) -> "NoteEntry":
+        return cls(
+            note_type = NoteType(value = data["note_type"]),
+            text = data["text"],
+            timestamp = datetime.fromisoformat(data["timestamp"])
+        )
+
+# Maintain static list of descriptive notes supporting users of the API 
+# and this derived resource
 SOURCE_NOTES: list[NoteEntry] = [
     NoteEntry.from_timestamp_str(note_type = NoteType.INFO, 
                                  text = "Ableton Live Object Model (LOM) reference: https://docs.cycling74.com/apiref/lom/",
@@ -64,16 +104,19 @@ SOURCE_NOTES: list[NoteEntry] = [
                                      timestamp_str = "2026-10-30")
 ]
 
+
+
 # Class describes metadata about the source repository and documentation,
 # generated from manually entered values and the README URL. This info is 
 # used to provide context for the API registry.
 class SourceMetadata:
-    def __init__(self, repository: str = SOURCE_REPOSITORY, author: str = SOURCE_AUTHOR, license: str = SOURCE_LICENSE, 
+    def __init__(self, repository: str = README_URL, author: str = SOURCE_AUTHOR, license: str = SOURCE_LICENSE, 
                  description: str = SOURCE_DESCRIPTION, min_ableton_version: str = SOURCE_MIN_ABLETON_VERSION, 
                  parsed_markdown:str|None = README_URL, notes: list[NoteEntry] = SOURCE_NOTES, 
                  last_updated:datetime = datetime.now(tz = timezone.utc)):
         if parsed_markdown is None or not parsed_markdown.strip():
             raise ValueError("[ERROR] Initialization failed: 'parsed_markdown' (AKA README URL) cannot be None, empty, or blank.")
+        
         self.repository:str = repository.strip()
         self.author:str = author.strip()
         self.license:str = license.strip()
@@ -83,15 +126,44 @@ class SourceMetadata:
         self.notes:list[NoteEntry] = notes
         self.last_updated: datetime = last_updated
 
-class APISection:
-    def __init__(self, api_name: str, api_description: str = "" ):
-        self.api_name = api_name.strip()
-        self.api_description:str = api_description.strip()
-        self.api_entries: list[APIEntry] = []
-    @classmethod
-    def as_empty_obj(cls):
-        return cls(api_name = "")
+    # SERIALIZE SourceMetadata instance into standard JSON types.
+    # Notes: Returns a dict object (enforced in Python as 
+    # a "suggestion"). Not decorated with @classmethod because 
+    # it requires access to instance properties.
+    def to_dict(self) -> dict:
+        return {
+            "repository": self.repository,
+            "author": self.author,
+            "license": self.license,
+            "description": self.description,
+            "min_ableton_version": self.min_ableton_version,
+            "parsed_markdown": self.parsed_markdown,
+            "notes": [note.to_dict() for note in self.notes],
+            "last_updated": self.last_updated.isoformat()
+        }
 
+    # DESERIALIZE dict instance into native SourceMetadata object
+    # instance and properties. Notes: Returns a SourceMetadata object 
+    # (enforced in Python as a "suggestion"). Decorated with @classmethod because
+    # it accesses the class definition
+    @classmethod
+    def from_dict(cls, data: dict) -> "SourceMetadata":
+        return cls(
+            repository = data["repository"],
+            author = data["author"],
+            license = data["license"],
+            description = data["description"],
+            min_ableton_version = data["min_ableton_version"],
+            parsed_markdown = data["parsed_markdown"],
+            notes = [NoteEntry.from_dict(data = d) for d in data["notes"]],
+            last_updated = datetime.fromisoformat(data["last_updated"])
+        )
+
+
+
+
+# Class describes each individual Ableton-OSC API methods
+# under each API section as described by the parsed source documentation
 class APIEntry:
     def __init__(self, address: str, mode: str, description: str, query_params: str, response: str, notes:list[NoteEntry]):
         self.address: str = address
@@ -100,11 +172,107 @@ class APIEntry:
         self.query_params: str = query_params
         self.response: str = response
         self.notes: list[NoteEntry] = notes
+    
+    # SERIALIZE APIEntry instance into standard JSON types.
+    # Notes: Returns a dict object (enforced in Python as 
+    # a "suggestion"). Not decorated with @classmethod because 
+    # it requires access to instance properties.
+    def to_dict(self) -> dict:
+        return {
+            "address": self.address,
+            "mode": self.mode,
+            "description": self.description,
+            "query_params": self.query_params,
+            "response": self.response,
+            "notes": [note.to_dict() for note in self.notes]
+        }
 
+    # DESERIALIZE dict instance into native APIEntry object
+    # instance and properties. Notes: Returns an APIEntry object 
+    # (enforced in Python as a "suggestion"). Decorated with @classmethod because
+    # it accesses the class definition
+    @classmethod
+    def from_dict(cls, data: dict) -> "APIEntry":
+        return cls(
+            address = data["address"],
+            mode = data["mode"],
+            description = data["description"],
+            query_params = data["query_params"],
+            response = data["response"],
+            notes = [NoteEntry.from_dict(data = d) for d in data.get("notes", [])]
+        )
+
+
+
+# Class describes each individual Ableton-OSC API group/type
+# and serves as a container for all methods that fall under
+# each of them.
+class APISection:
+    def __init__(self, api_name: str, api_description: str = "" ):
+        self.api_name: str = api_name.strip()
+        self.api_description:str = api_description.strip()
+        self.api_entries: list[APIEntry] = []
+    @classmethod
+    def as_empty_obj(cls):
+        return cls(api_name = "")
+
+    # SERIALIZE APISection instance into standard JSON types.
+    # Notes: Returns a dict object (enforced in Python as 
+    # a "suggestion"). Not decorated with @classmethod because 
+    # it requires access to instance properties.
+    def to_dict(self) -> dict:
+        return {
+            "api_name": self.api_name,
+            "api_description": self.api_description,
+            "api_entries": [entry.to_dict() for entry in self.api_entries]
+        }
+
+    # DESERIALIZE dict instance into native APISection object
+    # instance and properties. Notes: Returns a APISection object 
+    # (enforced in Python as a "suggestion"). Decorated with @classmethod because
+    # it accesses the class definition
+    @classmethod
+    def from_dict(cls, data: dict) -> "APISection":
+        section = cls(
+            api_name = data["api_name"],
+            api_description = data["api_description"]
+        )
+        section.api_entries= [APIEntry.from_dict(data = d) for d in data.get("api_entries", [])]
+        return section
+
+
+
+
+# Class describes outermost data structure encapsulating all info 
+# describing Ableton-OSC API metadata, sections, and methods
 class APIRegistry:
     def __init__(self, source_metadata:SourceMetadata):
         self.api_source:SourceMetadata = source_metadata
         self.api_sections:list[APISection] = []
+
+    # SERIALIZE APIRegistry instance into standard JSON types.
+    # Notes: Returns a dict object (enforced in Python as 
+    # a "suggestion"). Not decorated with @classmethod because 
+    # it requires access to instance properties.
+    def to_dict(self) -> dict:
+        return {
+            "api_name": self.api_name,
+            "api_description": self.api_description,
+            "api_entries": [entry.to_dict() for entry in self.api_entries]
+        }
+
+    # DESERIALIZE dict instance into native APISection object
+    # instance and properties. Notes: Returns a APISection object 
+    # (enforced in Python as a "suggestion"). Decorated with @classmethod because
+    # it accesses the class definition
+    @classmethod
+    def from_dict(cls, data: dict) -> "APISection":
+        section = cls(
+            api_name = data["api_name"],
+            api_description = data["api_description"]
+        )
+        section.api_entries= [APIEntry.from_dict(data = d) for d in data.get("api_entries", [])]
+        return section
 
 
 # Fetches the latest raw Markdown text from the upstream repository
