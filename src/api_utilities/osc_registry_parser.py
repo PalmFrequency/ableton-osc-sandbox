@@ -450,16 +450,46 @@ def parse_markdown_tables(md_content):
 ############################################# STOP HERE 10/31/2026 12:10PM
 
 if __name__ == "__main__":
-    print("[INFO] Querying upstream data records from live repository...")
+    print("[INFO] Querying upstream records and metadata (as markkdown content) from Ableton-OSC source repository...")
     md_content: Any = fetch_raw_readme()
     
     if md_content:
+        # Phase 1: Parse data structures from text stream into native objects
+        
         print("[INFO] Extracting API from markdown docs as structured data...")
-        structured_json: Any = parse_markdown_tables(md_content)
+        structured_object_tree: Any = parse_markdown_tables(md_content)
+        #structured_json: Any = parse_markdown_tables(md_content)
+
+        # Phase 2: Flatten object tree down to clean JSON payloads via to_dict contract
+
+        serializable_json_dict: Any = structured_object_tree.to_dict()
+        output_path = "ableton_osc_registry.json"
+        
+        with open(file = output_path, mode = "w", encoding = "utf-8") as f:
+            json.dump(obj = serializable_json_dict, fp = f, indent = 4, ensure_ascii = False)
+        
+        print(f"[SUCCESS] Correctly serialized structural data layout fields to '{output_path}'.")
+
+        # Phase 3: Immediate Round-Trip Validation Check via from_dict
 
         # Format and save as local JSON file
         output_path = "ableton_osc_registry.json"
         with open(file = output_path, mode = "w", encoding = "utf-8") as f:
-            json.dump(obj = structured_json, fp = f, indent = 4, ensure_ascii = False)
+            json.dump(obj = structured_object_tree, fp = f, indent = 4, ensure_ascii = False)
             
-        print(f"[SUCCESS] Correctly mapped and outputted {len(structured_json['registry'])} robust schemas to '{output_path}'.")
+        print("[SUCCESS] Correctly mapped and outputted " +
+              f"{len(structured_object_tree['registry'])} robust schemas to '{output_path}'.")
+
+        print("[INFO] Testing hydration round-trip performance verification logic...")
+        with open(file = output_path, mode = "r", encoding = "utf-8") as f:
+            saved_json_payload: Any = json.load(fp = f)
+
+        # Re-hydrate dictionary data straight back into a fully operational object instance
+        hydrated_registry: APIRegistry = APIRegistry.from_dict(data = saved_json_payload)
+        print("\n--- ROUND-TRIP DIAGNOSTIC VALIDATION ---")
+        print(f"Hydrated Object Class Target : {type(hydrated_registry)}")
+        print(f"Total Sections Restored : {len(hydrated_registry.api_sections)}")
+        print(f"Metadata Source File Origin : {hydrated_registry.api_source.parsed_markdown}")
+        print(f"First Restored Section Name : {hydrated_registry.api_sections[0].api_name if hydrated_registry.api_sections else 'N/A'}")
+        print("----------------------------------------")
+        print("[SUCCESS] Pipeline validation complete. Ready to serve Marimo environment layers!")
