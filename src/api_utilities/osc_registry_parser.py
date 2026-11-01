@@ -10,6 +10,7 @@ from urllib.request import Request, urlopen
 ##################################
 # REMINDERS
 # Handle edge cases (10/31/2026)
+# Investigate Structure Void paths (11/1/2026)
 # Run mypy to flag/catch issues before "releases" (10/31/2026)
 # Create test cases (10/31/2026)
 # Create publicly accessible Marimo version of this utility (10/31/2026)
