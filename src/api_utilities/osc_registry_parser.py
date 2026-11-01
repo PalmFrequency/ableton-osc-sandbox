@@ -1,13 +1,18 @@
 import json
-import urllib.request
-from typing import Any
+import sys
 from datetime import datetime, timezone
 from enum import Enum
-
+from pathlib import Path
+from typing import Any
+from urllib.error import HTTPError, URLError
+from urllib.request import Request, urlopen
 
 ##################################
-# REMINDERS/TODO
+# REMINDERS
+# Handle edge cases (10/31/2026)
 # Run mypy to flag/catch issues before "releases" (10/31/2026)
+# Create test cases (10/31/2026)
+# Create publicly accessible Marimo version of this utility (10/31/2026)
 ##################################
 
 
@@ -15,19 +20,25 @@ from enum import Enum
 # Globals
 # ------------------------------------------------------------------------------------
 
-# [REQUIRED] Raw README markdown URL from the source repository for Ableton-OSC.
-README_URL = "https://raw.githubusercontent.com/ideoforms/AbletonOSC/master/README.md"
-# This is the primary source of truth for the OSC API registry which is parsed
-# and is used to dynamically generate the structured JSON schema.
-
-# ---------------------------------------
+# [REQUIRED] 
+# Raw README markdown URL from the source repository for Ableton-OSC - This is the 
+# primary source of truth for the OSC API registry which is parsed and is used to 
+# dynamically generate the structured JSON schema.
+README_URL:str = "https://raw.githubusercontent.com/ideoforms/AbletonOSC/master/README.md"
+# File Path to JSON file which is generated from the markdown URL
+# Example relative path: OUTPUT_JSON_PATH = "ableton_osc_registry.json"
+# Example absolute path: OUTPUT_JSON_PATH = 
+#    "C/users/my_user_name/documents/proj_name/ableton-osc/ableton_osc_registry.json"
+# If absolute path is used, parent diectory must already exist.
+# If output file already exists, it will be overwritten. 
+OUTPUT_JSON_PATH:str = r"compare_1_ableton_osc_registry_test.json"
 
 # [OPTIONAL]
-SOURCE_REPOSITORY = "https://github.com/ideoforms/AbletonOSC"
-SOURCE_AUTHOR = "https://github.com/ideoforms"
-SOURCE_LICENSE = "https://github.com/ideoforms/AbletonOSC?tab=MIT-1-ov-file"
-SOURCE_DESCRIPTION = "Control Ableton Live via Open Sound Control (OSC)"
-SOURCE_MIN_ABLETON_VERSION = "11.0"
+SOURCE_REPOSITORY:str = "https://github.com/ideoforms/AbletonOSC"
+SOURCE_AUTHOR:str = "https://github.com/ideoforms"
+SOURCE_LICENSE:str = "https://github.com/ideoforms/AbletonOSC?tab=MIT-1-ov-file"
+SOURCE_DESCRIPTION:str = "Control Ableton Live via Open Sound Control (OSC)"
+SOURCE_MIN_ABLETON_VERSION:str = "11.0"
 
 
 
@@ -63,13 +74,14 @@ class NoteEntry:
     # Default constructor for NoteEntry
     def __init__(self, note_type: NoteType, text: str, timestamp: datetime):
         self.note_type: NoteType = note_type
-        self.text: str = text
+        self.text: str = text.strip()
         self.timestamp: datetime = timestamp
 
     # Alt constructor to create from a timestamp string with timezone (default is UTC).
     # timestamp_str format should be "YYYY-MM-DD" (e.g., "2026-10-28")
     @classmethod
     def from_timestamp_str(cls, note_type: NoteType, text: str, timestamp_str: str, timezone: timezone = timezone.utc):
+        text: str = text.strip()
         try:
             timestamp: datetime = datetime.fromisoformat(timestamp_str).replace(tzinfo=timezone)
             return cls(note_type, text, timestamp)
@@ -83,8 +95,8 @@ class NoteEntry:
     # it requires access to instance properties.
     def to_dict(self) -> dict:
         return {
-            "note_type" : self.note_type.value,
-            "text" : self.text,
+            "note_type" : self.note_type.value.strip(),
+            "text" : self.text.strip(),
             "timestamp" : self.timestamp.isoformat()
         }
 
@@ -107,7 +119,7 @@ SOURCE_NOTES: list[NoteEntry] = [
                                  text = "Ableton Live Object Model (LOM) reference: https://docs.cycling74.com/apiref/lom/",
                                  timestamp_str = "2026-10-28"),
     NoteEntry.from_timestamp_str(note_type = NoteType.INFO, 
-                                     text = "Source code to create this registry: https://github.com/PalmFrequency/ableton-osc-sandbox/blob/main/src/api_utilities/osc_registry_parser.py",
+                                     text = "Source code to create this JSON structured data: https://github.com/PalmFrequency/ableton-osc-sandbox/blob/main/src/api_utilities/osc_registry_parser.py",
                                      timestamp_str = "2026-10-30")
 ]
 
@@ -117,7 +129,7 @@ SOURCE_NOTES: list[NoteEntry] = [
 # generated from manually entered values and the README URL. This info is 
 # used to provide context for the API registry.
 class SourceMetadata:
-    def __init__(self, repository: str = README_URL, author: str = SOURCE_AUTHOR, license: str = SOURCE_LICENSE, 
+    def __init__(self, repository: str = SOURCE_REPOSITORY, author: str = SOURCE_AUTHOR, license: str = SOURCE_LICENSE, 
                  description: str = SOURCE_DESCRIPTION, min_ableton_version: str = SOURCE_MIN_ABLETON_VERSION, 
                  parsed_markdown:str|None = README_URL, notes: list[NoteEntry] = SOURCE_NOTES, 
                  last_updated:datetime = datetime.now(tz = timezone.utc)):
@@ -139,12 +151,12 @@ class SourceMetadata:
     # it requires access to instance properties.
     def to_dict(self) -> dict:
         return {
-            "repository": self.repository,
-            "author": self.author,
-            "license": self.license,
-            "description": self.description,
-            "min_ableton_version": self.min_ableton_version,
-            "parsed_markdown": self.parsed_markdown,
+            "repository": self.repository.strip(),
+            "author": self.author.strip(),
+            "license": self.license.strip(),
+            "description": self.description.strip(),
+            "min_ableton_version": self.min_ableton_version.strip(),
+            "parsed_markdown": self.parsed_markdown.strip(),
             "notes": [note.to_dict() for note in self.notes],
             "last_updated": self.last_updated.isoformat()
         }
@@ -172,11 +184,11 @@ class SourceMetadata:
 # under each API section as described by the parsed source documentation
 class APIEntry:
     def __init__(self, address: str, mode: str, description: str, query_params: str, response: str, notes:list[NoteEntry]):
-        self.address: str = address
-        self.mode: str = mode
-        self.description: str = description
-        self.query_params: str = query_params
-        self.response: str = response
+        self.address: str = address.strip()
+        self.mode: str = mode.strip()
+        self.description: str = description.strip()
+        self.query_params: str = query_params.strip()
+        self.response: str = response.strip()
         self.notes: list[NoteEntry] = notes
     
     # SERIALIZE APIEntry instance into standard JSON types.
@@ -185,11 +197,11 @@ class APIEntry:
     # it requires access to instance properties.
     def to_dict(self) -> dict:
         return {
-            "address": self.address,
-            "mode": self.mode,
-            "description": self.description,
-            "query_params": self.query_params,
-            "response": self.response,
+            "address": self.address.strip(),
+            "mode": self.mode.strip(),
+            "description": self.description.strip(),
+            "query_params": self.query_params.strip(),
+            "response": self.response.strip(),
             "notes": [note.to_dict() for note in self.notes]
         }
 
@@ -228,8 +240,8 @@ class APISection:
     # it requires access to instance properties.
     def to_dict(self) -> dict:
         return {
-            "api_name": self.api_name,
-            "api_description": self.api_description,
+            "api_name": self.api_name.strip(),
+            "api_description": self.api_description.strip(),
             "api_entries": [entry.to_dict() for entry in self.api_entries]
         }
 
@@ -286,12 +298,21 @@ class APIRegistry:
 
 # Download the latest raw markdown text from the upstream repository for processing.
 def fetch_raw_readme(url:str = README_URL):
+    if not url:
+        raise ValueError("README_URL is empty or None.")
+
+    # Adding a User-Agent header is best practice; many servers block bare urllib requests
+    req = Request(url, headers = {"User-Agent" : "Python-urllib-script"})
+
     try:
-        with urllib.request.urlopen(url, timeout = 10) as response:
-            return response.read().decode('utf-8')
-    except Exception as e:
-        print(f"[ERROR] Failed to fetch upstream documentation which is the source of the API: {e}")
-        return None
+        with urlopen(req, timeout = 10) as response:
+            return response.read().decode("utf-8")
+    except (HTTPError, URLError) as e:
+        print(f"[ERROR] Failed to access content at {url}:\n{e}", file=sys.stderr)
+        raise
+    except UnicodeDecodeError as e:
+        print(f"[ERROR] Failed to decode response as UTF-8:\n{e}", file=sys.stderr)
+        raise
 
 # ---------------------------------------
 
@@ -371,6 +392,28 @@ def parse_markdown_tables(md_content):
 
     return api_registry
 
+# ---------------------------------------
+
+# Analyze output file path - Relative and absolute path are supported.
+# Either forward or backward slashes are supported with absolute paths.
+# If absolute path is used, parent diectory must already exist.
+# If output file already exists, it will be overwritten. 
+def process_file_path(file_path_string: str = OUTPUT_JSON_PATH) -> Path:
+    if not file_path_string:
+        raise ValueError("OUTPUT_JSON_PATH is empty or None.")
+
+    path = Path(file_path_string).resolve()
+
+    if not path.parent.is_dir():
+        raise FileNotFoundError(
+            f"The specified output directory does not exist: {path.parent}"
+        )
+
+    return path
+
+def handle_edge_cases():
+    # TODO
+    return None
 
 # def handle_edge_cases(address, api_group, cols, col_map):
 #     """
@@ -447,49 +490,42 @@ def parse_markdown_tables(md_content):
 #     return entry
 
 
-############################################# STOP HERE 10/31/2026 12:10PM
-
 if __name__ == "__main__":
-    print("[INFO] Querying upstream records and metadata (as markkdown content) from Ableton-OSC source repository...")
+    print("]INFO] Starting utility to generate structured data describing the current Ableton-OSC API ...")
+    
+    print("[INFO] -> Downloading and extracting API description from markdown content ...")
     md_content: Any = fetch_raw_readme()
     
-    if md_content:
-        # Phase 1: Parse data structures from text stream into native objects
-        
-        print("[INFO] Extracting API from markdown docs as structured data...")
-        structured_object_tree: Any = parse_markdown_tables(md_content)
-        #structured_json: Any = parse_markdown_tables(md_content)
+    if not md_content:
+        raise ValueError("Markdown content is empty or None.")
+    
+    structured_object_tree: Any = parse_markdown_tables(md_content)
+    # Flatten object tree down to clean JSON payloads via to_dict contracts
+    json_serializable_dict: Any = structured_object_tree.to_dict()
 
-        # Phase 2: Flatten object tree down to clean JSON payloads via to_dict contract
+    # Save JSON serialization
+    output_path: Path = process_file_path()
+    with open(file = output_path, mode = "w", encoding = "utf-8") as f:
+        json.dump(obj = json_serializable_dict, fp = f, indent = 4, ensure_ascii = False)
+    
+    print("[SUCCESS] Serialized data layout describing the current Ableton-OSC API to:\r\n" +
+            f"'{output_path}'.")
 
-        serializable_json_dict: Any = structured_object_tree.to_dict()
-        output_path = "ableton_osc_registry.json"
-        
-        with open(file = output_path, mode = "w", encoding = "utf-8") as f:
-            json.dump(obj = serializable_json_dict, fp = f, indent = 4, ensure_ascii = False)
-        
-        print(f"[SUCCESS] Correctly serialized structural data layout fields to '{output_path}'.")
 
-        # Phase 3: Immediate Round-Trip Validation Check via from_dict
+    ##################################
+    # DEBUG ONLY
+    # Deserialize JSON file into APIRegistry object (1-2)
+    # Compare with original object which was serialized (3)
+    ##################################
+    # Deserialization Example
+    # (1). Load JSON file with compatible schema 
+    with open(file = output_path, mode = "r", encoding = "utf-8") as f:
+        json_payload: Any = json.load(fp = f)
+    # (2). Deserialize JSON into supported objects
+    registry_from_json: APIRegistry = APIRegistry.from_dict(data = json_payload)
+    # (3). Compare original APIRegistry with deserialized (dict) version
+    print("Test Result - APIRegistry obj original version " +
+            f"matches deserialized version: {json_serializable_dict == registry_from_json.to_dict()}")
 
-        # Format and save as local JSON file
-        output_path = "ableton_osc_registry.json"
-        with open(file = output_path, mode = "w", encoding = "utf-8") as f:
-            json.dump(obj = structured_object_tree, fp = f, indent = 4, ensure_ascii = False)
-            
-        print("[SUCCESS] Correctly mapped and outputted " +
-              f"{len(structured_object_tree['registry'])} robust schemas to '{output_path}'.")
-
-        print("[INFO] Testing hydration round-trip performance verification logic...")
-        with open(file = output_path, mode = "r", encoding = "utf-8") as f:
-            saved_json_payload: Any = json.load(fp = f)
-
-        # Re-hydrate dictionary data straight back into a fully operational object instance
-        hydrated_registry: APIRegistry = APIRegistry.from_dict(data = saved_json_payload)
-        print("\n--- ROUND-TRIP DIAGNOSTIC VALIDATION ---")
-        print(f"Hydrated Object Class Target : {type(hydrated_registry)}")
-        print(f"Total Sections Restored : {len(hydrated_registry.api_sections)}")
-        print(f"Metadata Source File Origin : {hydrated_registry.api_source.parsed_markdown}")
-        print(f"First Restored Section Name : {hydrated_registry.api_sections[0].api_name if hydrated_registry.api_sections else 'N/A'}")
-        print("----------------------------------------")
-        print("[SUCCESS] Pipeline validation complete. Ready to serve Marimo environment layers!")
+    with open(file = "compare_2_registry_from_json_to_dict.json", mode = "w", encoding = "utf-8") as f:
+        json.dump(obj = registry_from_json.to_dict(), fp = f, indent = 4, ensure_ascii = False)

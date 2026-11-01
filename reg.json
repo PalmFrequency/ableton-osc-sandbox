@@ -1,0 +1,2103 @@
+{
+    "api_source": {
+        "repository": "https://raw.githubusercontent.com/ideoforms/AbletonOSC/master/README.md",
+        "author": "https://github.com/ideoforms",
+        "license": "https://github.com/ideoforms/AbletonOSC?tab=MIT-1-ov-file",
+        "description": "Control Ableton Live via Open Sound Control (OSC)",
+        "min_ableton_version": "11.0",
+        "parsed_markdown": "https://raw.githubusercontent.com/ideoforms/AbletonOSC/master/README.md",
+        "notes": [
+            {
+                "note_type": "info",
+                "text": "Ableton Live Object Model (LOM) reference: https://docs.cycling74.com/apiref/lom/",
+                "timestamp": "2026-10-28T00:00:00+00:00"
+            },
+            {
+                "note_type": "info",
+                "text": "Source code to create this registry: https://github.com/PalmFrequency/ableton-osc-sandbox/blob/main/src/api_utilities/osc_registry_parser.py",
+                "timestamp": "2026-10-30T00:00:00+00:00"
+            }
+        ],
+        "last_updated": "2026-10-31T23:48:05.116874+00:00"
+    },
+    "api_sections": [
+        {
+            "api_name": "Application API",
+            "api_description": "",
+            "api_entries": [
+                {
+                    "address": "/live/test",
+                    "mode": "get",
+                    "description": "Display a confirmation message in Live, and sends an OSC reply to /live/test",
+                    "query_params": "",
+                    "response": "'ok'",
+                    "notes": []
+                },
+                {
+                    "address": "/live/application/get/version",
+                    "mode": "get",
+                    "description": "Query Live's version",
+                    "query_params": "",
+                    "response": "major_version, minor_version",
+                    "notes": []
+                },
+                {
+                    "address": "/live/api/reload",
+                    "mode": "get",
+                    "description": "Initiates a live reload of the AbletonOSC server code. Used in development only.",
+                    "query_params": "",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/api/get/log_level",
+                    "mode": "get",
+                    "description": "Returns the current log level. Default is `info`.",
+                    "query_params": "",
+                    "response": "log_level",
+                    "notes": []
+                },
+                {
+                    "address": "/live/api/set/log_level",
+                    "mode": "set",
+                    "description": "Set the log level, which can be one of: `debug`, `info`, `warning`, `error`, `critical`.",
+                    "query_params": "log_level",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/api/show_message",
+                    "mode": "get",
+                    "description": "Show a message in Live's status bar",
+                    "query_params": "message",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/startup",
+                    "mode": "get",
+                    "description": "",
+                    "query_params": "",
+                    "response": "Sent to the client application when AbletonOSC is started",
+                    "notes": []
+                },
+                {
+                    "address": "/live/error",
+                    "mode": "get",
+                    "description": "",
+                    "query_params": "error_msg",
+                    "response": "Sent to the client application when an error occurs. For more diagnostics, see logs/abletonosc.log",
+                    "notes": []
+                }
+            ]
+        },
+        {
+            "api_name": "Song API",
+            "api_description": "Represents the top-level Song object. Used to start/stop playback, create/modify scenes, create/jump to cue points, and set global parameters (tempo, metronome). ",
+            "api_entries": [
+                {
+                    "address": "/live/song/capture_midi",
+                    "mode": "get",
+                    "description": "Capture midi",
+                    "query_params": "",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/continue_playing",
+                    "mode": "get",
+                    "description": "Resume session playback",
+                    "query_params": "",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/create_audio_track",
+                    "mode": "get",
+                    "description": "Create a new audio track at the specified index (-1 = end of list)",
+                    "query_params": "index",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/create_midi_track",
+                    "mode": "get",
+                    "description": "Create a new MIDI track at the specified index (-1 = end of list)",
+                    "query_params": "index",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/create_return_track",
+                    "mode": "get",
+                    "description": "Create a new return track",
+                    "query_params": "",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/create_scene",
+                    "mode": "get",
+                    "description": "Create a new scene at the specified index (-1 = end of list)",
+                    "query_params": "index",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/cue_point/jump",
+                    "mode": "get",
+                    "description": "Jump to a specific cue point, by name or numeric index (based on the list of cue points)",
+                    "query_params": "cue_point",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/cue_point/add_or_delete",
+                    "mode": "get",
+                    "description": "Add a cue point under the cursor, or, if one exists, delete it",
+                    "query_params": "",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/cue_point/set/name",
+                    "mode": "set",
+                    "description": "Rename a cue point, given its index",
+                    "query_params": "cue_point",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/delete_scene",
+                    "mode": "get",
+                    "description": "Delete a scene",
+                    "query_params": "scene_index",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/delete_return_track",
+                    "mode": "get",
+                    "description": "Delete a return track",
+                    "query_params": "track_index",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/delete_track",
+                    "mode": "get",
+                    "description": "Delete a track",
+                    "query_params": "track_index",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/duplicate_scene",
+                    "mode": "get",
+                    "description": "Duplicate a scene",
+                    "query_params": "scene_index",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/duplicate_track",
+                    "mode": "get",
+                    "description": "Duplicate a track",
+                    "query_params": "track_index",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/jump_by",
+                    "mode": "get",
+                    "description": "Jump song position by the specified time, in beats",
+                    "query_params": "time",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/jump_to_next_cue",
+                    "mode": "get",
+                    "description": "Jump to the next cue marker",
+                    "query_params": "",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/jump_to_prev_cue",
+                    "mode": "get",
+                    "description": "Jump to the previous cue marker",
+                    "query_params": "",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/redo",
+                    "mode": "get",
+                    "description": "Redo the last undone operation",
+                    "query_params": "",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/start_playing",
+                    "mode": "get",
+                    "description": "Start session playback",
+                    "query_params": "",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/stop_playing",
+                    "mode": "get",
+                    "description": "Stop session playback",
+                    "query_params": "",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/stop_all_clips",
+                    "mode": "get",
+                    "description": "Stop all clips from playing",
+                    "query_params": "",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/tap_tempo",
+                    "mode": "get",
+                    "description": "Mimics a tap of the \"Tap Tempo\" button",
+                    "query_params": "",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/trigger_session_record",
+                    "mode": "get",
+                    "description": "Triggers record in session mode",
+                    "query_params": "",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/undo",
+                    "mode": "get",
+                    "description": "Undo the last operation",
+                    "query_params": "",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/get/arrangement_overdub",
+                    "mode": "get",
+                    "description": "Query whether arrangement overdub is on",
+                    "query_params": "",
+                    "response": "arrangement_overdub",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/get/back_to_arranger",
+                    "mode": "get",
+                    "description": "Query whether \"back to arranger\" is lit",
+                    "query_params": "",
+                    "response": "back_to_arranger",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/get/can_redo",
+                    "mode": "get",
+                    "description": "Query whether redo is available",
+                    "query_params": "",
+                    "response": "can_redo",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/get/can_undo",
+                    "mode": "get",
+                    "description": "Query whether undo is available",
+                    "query_params": "",
+                    "response": "can_undo",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/get/clip_trigger_quantization",
+                    "mode": "get",
+                    "description": "Query the current clip trigger quantization level",
+                    "query_params": "",
+                    "response": "clip_trigger_quantization",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/get/current_song_time",
+                    "mode": "get",
+                    "description": "Query the current song time, in beats",
+                    "query_params": "",
+                    "response": "current_song_time",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/get/groove_amount",
+                    "mode": "get",
+                    "description": "Query the current groove amount",
+                    "query_params": "",
+                    "response": "groove_amount",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/get/is_playing",
+                    "mode": "get",
+                    "description": "Query whether the song is currently playing",
+                    "query_params": "",
+                    "response": "is_playing",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/get/loop",
+                    "mode": "get",
+                    "description": "Query whether the song is currently looping",
+                    "query_params": "",
+                    "response": "loop",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/get/loop_length",
+                    "mode": "get",
+                    "description": "Query the current loop length",
+                    "query_params": "",
+                    "response": "loop_length",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/get/loop_start",
+                    "mode": "get",
+                    "description": "Query the current loop start point",
+                    "query_params": "",
+                    "response": "loop_start",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/get/metronome",
+                    "mode": "get",
+                    "description": "Query metronome on/off",
+                    "query_params": "",
+                    "response": "metronome_on",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/get/midi_recording_quantization",
+                    "mode": "get",
+                    "description": "Query the current MIDI recording quantization",
+                    "query_params": "",
+                    "response": "midi_recording_quantization",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/get/nudge_down",
+                    "mode": "get",
+                    "description": "Query nudge down",
+                    "query_params": "",
+                    "response": "nudge_down",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/get/nudge_up",
+                    "mode": "get",
+                    "description": "Query nudge up",
+                    "query_params": "",
+                    "response": "nudge_up",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/get/punch_in",
+                    "mode": "get",
+                    "description": "Query punch in",
+                    "query_params": "",
+                    "response": "punch_in",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/get/punch_out",
+                    "mode": "get",
+                    "description": "Query punch out",
+                    "query_params": "",
+                    "response": "punch_out",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/get/record_mode",
+                    "mode": "get",
+                    "description": "Query the current record mode",
+                    "query_params": "",
+                    "response": "record_mode",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/get/root_note",
+                    "mode": "get",
+                    "description": "Query the current root note",
+                    "query_params": "",
+                    "response": "root_note",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/get/scale_name",
+                    "mode": "get",
+                    "description": "Query the current scale name",
+                    "query_params": "",
+                    "response": "scale_name",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/get/session_record",
+                    "mode": "get",
+                    "description": "Query whether session record is enabled",
+                    "query_params": "",
+                    "response": "session_record",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/get/session_record_status",
+                    "mode": "get",
+                    "description": "Query the current session record status",
+                    "query_params": "",
+                    "response": "session_record_status",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/get/signature_denominator",
+                    "mode": "get",
+                    "description": "Query the current time signature's denominator",
+                    "query_params": "",
+                    "response": "denominator",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/get/signature_numerator",
+                    "mode": "get",
+                    "description": "Query the current time signature's numerator",
+                    "query_params": "",
+                    "response": "numerator",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/get/song_length",
+                    "mode": "get",
+                    "description": "Query the song arrangement length, in beats",
+                    "query_params": "",
+                    "response": "song_length",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/get/tempo",
+                    "mode": "get",
+                    "description": "Query the current song tempo",
+                    "query_params": "",
+                    "response": "tempo_bpm",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/set/arrangement_overdub",
+                    "mode": "set",
+                    "description": "Set arrangement overdub (1=on, 0=off)",
+                    "query_params": "arrangement_overdub",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/set/back_to_arranger",
+                    "mode": "set",
+                    "description": "Set whether \"back to arranger\" is lit (1=on, 0=off)",
+                    "query_params": "back_to_arranger",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/set/clip_trigger_quantization",
+                    "mode": "set",
+                    "description": "Set the current clip trigger quantization level",
+                    "query_params": "clip_trigger_quantization",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/set/current_song_time",
+                    "mode": "set",
+                    "description": "Set the current song time, in beats",
+                    "query_params": "current_song_time",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/set/groove_amount",
+                    "mode": "set",
+                    "description": "Set the current groove amount",
+                    "query_params": "groove_amount",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/set/loop",
+                    "mode": "set",
+                    "description": "Set whether the song is currently looping (1=on, 0=off)",
+                    "query_params": "loop",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/set/loop_length",
+                    "mode": "set",
+                    "description": "Set the current loop length",
+                    "query_params": "loop_length",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/set/loop_start",
+                    "mode": "set",
+                    "description": "Set the current loop start point",
+                    "query_params": "loop_start",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/set/metronome",
+                    "mode": "set",
+                    "description": "Set metronome (1=on, 0=off)",
+                    "query_params": "metronome_on",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/set/midi_recording_quantization",
+                    "mode": "set",
+                    "description": "Set the current MIDI recording quantization",
+                    "query_params": "midi_recording_quantization",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/set/nudge_down",
+                    "mode": "set",
+                    "description": "Set nudge down",
+                    "query_params": "nudge_down",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/set/nudge_up",
+                    "mode": "set",
+                    "description": "Set nudge up",
+                    "query_params": "nudge_up",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/set/punch_in",
+                    "mode": "set",
+                    "description": "Set punch in",
+                    "query_params": "punch_in",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/set/punch_out",
+                    "mode": "set",
+                    "description": "Set punch out",
+                    "query_params": "punch_out",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/set/record_mode",
+                    "mode": "set",
+                    "description": "Set the current record mode",
+                    "query_params": "record_mode",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/set/session_record",
+                    "mode": "set",
+                    "description": "Set whether session record is enabled (1=on, 0=off)",
+                    "query_params": "session_record",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/set/signature_denominator",
+                    "mode": "set",
+                    "description": "Set the time signature's denominator",
+                    "query_params": "signature_denominator",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/set/signature_numerator",
+                    "mode": "set",
+                    "description": "Set the time signature's numerator",
+                    "query_params": "signature_numerator",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/set/record_mode",
+                    "mode": "set",
+                    "description": "Set the current record mode",
+                    "query_params": "record_mode",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/set/tempo",
+                    "mode": "set",
+                    "description": "Set the current song tempo",
+                    "query_params": "tempo_bpm",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/get/cue_points",
+                    "mode": "get",
+                    "description": "Query a list of the song's cue points",
+                    "query_params": "",
+                    "response": "name, time, ...",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/get/num_scenes",
+                    "mode": "get",
+                    "description": "Query the number of scenes",
+                    "query_params": "",
+                    "response": "num_scenes",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/get/num_tracks",
+                    "mode": "get",
+                    "description": "Query the number of tracks",
+                    "query_params": "",
+                    "response": "num_tracks",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/get/track_names",
+                    "mode": "get",
+                    "description": "Query track names (optionally, over a given range)",
+                    "query_params": "",
+                    "response": "[index_min, index_max]",
+                    "notes": []
+                },
+                {
+                    "address": "/live/song/get/track_data",
+                    "mode": "get",
+                    "description": "Query bulk properties of multiple tracks/clips. See below for further info.",
+                    "query_params": "",
+                    "response": "[various]",
+                    "notes": []
+                }
+            ]
+        },
+        {
+            "api_name": "View API",
+            "api_description": "Represents the view (user interface) of live ",
+            "api_entries": [
+                {
+                    "address": "/live/view/get/selected_scene",
+                    "mode": "get",
+                    "description": "Returns the selected scene index (first scene = 0)",
+                    "query_params": "",
+                    "response": "scene_index",
+                    "notes": []
+                },
+                {
+                    "address": "/live/view/get/selected_track",
+                    "mode": "get",
+                    "description": "Returns the selected index track (first track = 0)",
+                    "query_params": "",
+                    "response": "track_index",
+                    "notes": []
+                },
+                {
+                    "address": "/live/view/get/selected_clip",
+                    "mode": "get",
+                    "description": "Returns the track and scene index of the selected clip",
+                    "query_params": "",
+                    "response": "track_index, scene_index",
+                    "notes": []
+                },
+                {
+                    "address": "/live/view/get/selected_device",
+                    "mode": "get",
+                    "description": "Get the selected device (first device = 0)",
+                    "query_params": "",
+                    "response": "track_index, device_index",
+                    "notes": []
+                },
+                {
+                    "address": "/live/view/set/selected_scene",
+                    "mode": "set",
+                    "description": "Set the selected scene (first scene = 0)",
+                    "query_params": "scene_index",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/view/set/selected_track",
+                    "mode": "set",
+                    "description": "Set the selected track (first track = 0)",
+                    "query_params": "track_index",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/view/set/selected_clip",
+                    "mode": "set",
+                    "description": "Set the selected clip",
+                    "query_params": "track_index, scene_index",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/view/set/selected_device",
+                    "mode": "set",
+                    "description": "Set the selected device (first device = 0)",
+                    "query_params": "track_index, device_index",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/view/start_listen/selected_scene",
+                    "mode": "observe",
+                    "description": "Start listening to the selected scene (first scene = 0)",
+                    "query_params": "",
+                    "response": "selected_scene",
+                    "notes": []
+                },
+                {
+                    "address": "/live/view/start_listen/selected_track",
+                    "mode": "observe",
+                    "description": "Start listening to selected track (first track = 0)",
+                    "query_params": "",
+                    "response": "selected_track",
+                    "notes": []
+                },
+                {
+                    "address": "/live/view/stop_listen/selected_scene",
+                    "mode": "unobserve",
+                    "description": "Stop listening to the selected scene (first scene = 0)",
+                    "query_params": "",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/view/stop_listen/selected_track",
+                    "mode": "unobserve",
+                    "description": "Stop listening to selected track (first track = 0)",
+                    "query_params": "",
+                    "response": "",
+                    "notes": []
+                }
+            ]
+        },
+        {
+            "api_name": "Track API",
+            "api_description": "Represents an audio, MIDI, return or master track. Can be used to set track audio parameters (volume, panning, send, mute, solo), listen for the playing clip slot, query devices, etc. Can also be used to query clips in arrangement view. To query the properties of multiple tracks, see [Song: Properties of cue points, scenes and tracks](https://github.com/ideoforms/AbletonOSC#song-properties-of-cue-points-scenes-and-tracks). ",
+            "api_entries": [
+                {
+                    "address": "/live/track/stop_all_clips",
+                    "mode": "get",
+                    "description": "Stop all clips on track",
+                    "query_params": "track_id",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/get/arm",
+                    "mode": "get",
+                    "description": "Query whether track is armed",
+                    "query_params": "track_id",
+                    "response": "track_id, armed",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/get/available_input_routing_channels",
+                    "mode": "get",
+                    "description": "List input channels (e.g. \"1\", \"2\", \"1/2\", ...)",
+                    "query_params": "track_id",
+                    "response": "track_id, channel, ...",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/get/available_input_routing_types",
+                    "mode": "get",
+                    "description": "List input routes (e.g. \"Ext. In\", ...)",
+                    "query_params": "track_id",
+                    "response": "track_id, type, ...",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/get/available_output_routing_channels",
+                    "mode": "get",
+                    "description": "List output channels (e.g. \"1\", \"2\", \"1/2\", ...)",
+                    "query_params": "track_id",
+                    "response": "track_id, channel, ...",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/get/available_output_routing_types",
+                    "mode": "get",
+                    "description": "List output routes (e.g. \"Ext. Out\", ...)",
+                    "query_params": "track_id",
+                    "response": "track_id, type, ...",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/get/can_be_armed",
+                    "mode": "get",
+                    "description": "Query whether track can be armed",
+                    "query_params": "track_id",
+                    "response": "track_id, can_be_armed",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/get/color",
+                    "mode": "get",
+                    "description": "Query track color",
+                    "query_params": "track_id",
+                    "response": "track_id, color",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/get/color_index",
+                    "mode": "get",
+                    "description": "Query track color index",
+                    "query_params": "track_id",
+                    "response": "track_id, color_index",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/get/current_monitoring_state",
+                    "mode": "get",
+                    "description": "Query current monitoring state (1=on, 0=off)",
+                    "query_params": "track_id",
+                    "response": "track_id, state",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/get/fired_slot_index",
+                    "mode": "get",
+                    "description": "Query currently-fired slot",
+                    "query_params": "track_id",
+                    "response": "track_id, index",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/get/fold_state",
+                    "mode": "get",
+                    "description": "Query folded state (for groups)",
+                    "query_params": "track_id",
+                    "response": "track_id, fold_state",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/get/has_audio_input",
+                    "mode": "get",
+                    "description": "Query has_audio_input",
+                    "query_params": "track_id",
+                    "response": "track_id, has_audio_input",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/get/has_audio_output",
+                    "mode": "get",
+                    "description": "Query has_audio_output",
+                    "query_params": "track_id",
+                    "response": "track_id, has_audio_output",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/get/has_midi_input",
+                    "mode": "get",
+                    "description": "Query has_midi_input",
+                    "query_params": "track_id",
+                    "response": "track_id, has_midi_input",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/get/has_midi_output",
+                    "mode": "get",
+                    "description": "Query has_midi_output",
+                    "query_params": "track_id",
+                    "response": "track_id, has_midi_output",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/get/input_routing_channel",
+                    "mode": "get",
+                    "description": "Query current input routing channel",
+                    "query_params": "track_id",
+                    "response": "track_id, channel",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/get/input_routing_type",
+                    "mode": "get",
+                    "description": "Query current input routing type",
+                    "query_params": "track_id",
+                    "response": "track_id, type",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/get/output_routing_channel",
+                    "mode": "get",
+                    "description": "Query current output routing channel",
+                    "query_params": "track_id",
+                    "response": "track_id, channel",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/get/output_meter_left",
+                    "mode": "get",
+                    "description": "Query current output level, left channel",
+                    "query_params": "track_id",
+                    "response": "track_id, level",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/get/output_meter_level",
+                    "mode": "get",
+                    "description": "Query current output level, both channels",
+                    "query_params": "track_id",
+                    "response": "track_id, level",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/get/output_meter_right",
+                    "mode": "get",
+                    "description": "Query current output level, right channel",
+                    "query_params": "track_id",
+                    "response": "track_id, level",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/get/output_routing_type",
+                    "mode": "get",
+                    "description": "Query current output routing type",
+                    "query_params": "track_id",
+                    "response": "track_id, type",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/get/is_foldable",
+                    "mode": "get",
+                    "description": "Query whether track is foldable, i.e. is a group",
+                    "query_params": "track_id",
+                    "response": "track_id, is_foldable",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/get/is_grouped",
+                    "mode": "get",
+                    "description": "Query whether track is in a group",
+                    "query_params": "track_id",
+                    "response": "track_id, is_grouped",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/get/is_visible",
+                    "mode": "get",
+                    "description": "Query whether track is visible (1=on, 0=off)",
+                    "query_params": "track_id",
+                    "response": "track_id, is_visible",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/get/mute",
+                    "mode": "get",
+                    "description": "Query track mute (1=on, 0=off)",
+                    "query_params": "track_id",
+                    "response": "track_id, mute",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/get/name",
+                    "mode": "get",
+                    "description": "Query track name",
+                    "query_params": "track_id",
+                    "response": "track_id, name",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/get/panning",
+                    "mode": "get",
+                    "description": "Query track panning",
+                    "query_params": "track_id",
+                    "response": "track_id, panning",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/get/playing_slot_index",
+                    "mode": "get",
+                    "description": "Query currently-playing slot",
+                    "query_params": "track_id",
+                    "response": "track_id, index",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/get/send",
+                    "mode": "get",
+                    "description": "Query track send",
+                    "query_params": "track_id, send_id",
+                    "response": "track_id, send_id, value",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/get/solo",
+                    "mode": "get",
+                    "description": "Query track solo on/off",
+                    "query_params": "track_id",
+                    "response": "track_id, solo",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/get/volume",
+                    "mode": "get",
+                    "description": "Query track volume",
+                    "query_params": "track_id",
+                    "response": "track_id, volume",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/set/arm",
+                    "mode": "set",
+                    "description": "Set track arm state (1=on, 0=off)",
+                    "query_params": "track_id, armed",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/set/color",
+                    "mode": "set",
+                    "description": "Set track color",
+                    "query_params": "track_id, color",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/set/color_index",
+                    "mode": "set",
+                    "description": "Set track color index",
+                    "query_params": "track_id, color_index",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/set/current_monitoring_state",
+                    "mode": "set",
+                    "description": "Set monitoring on/off",
+                    "query_params": "track_id, state",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/set/fold_state",
+                    "mode": "set",
+                    "description": "Set group folded (1=on, 0=off)",
+                    "query_params": "track_id, fold_state",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/set/input_routing_channel",
+                    "mode": "set",
+                    "description": "Set input routing channel",
+                    "query_params": "track_id, channel",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/set/input_routing_type",
+                    "mode": "set",
+                    "description": "Set input routing type",
+                    "query_params": "track_id, type",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/set/mute",
+                    "mode": "set",
+                    "description": "Set track mute (1=on, 0=off)",
+                    "query_params": "track_id, mute",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/set/name",
+                    "mode": "set",
+                    "description": "Set track name",
+                    "query_params": "track_id, name",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/set/output_routing_channel",
+                    "mode": "set",
+                    "description": "Set output routing channel",
+                    "query_params": "track_id, channel",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/set/output_routing_type",
+                    "mode": "set",
+                    "description": "Set output routing type",
+                    "query_params": "track_id, type",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/set/panning",
+                    "mode": "set",
+                    "description": "Set track panning",
+                    "query_params": "track_id, panning",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/set/send",
+                    "mode": "set",
+                    "description": "Set track send",
+                    "query_params": "track_id, send_id, value",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/set/solo",
+                    "mode": "set",
+                    "description": "Set track solo (1=on, 0=off)",
+                    "query_params": "track_id, solo",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/set/volume",
+                    "mode": "set",
+                    "description": "Set track volume",
+                    "query_params": "track_id, volume",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/get/clips/name",
+                    "mode": "get",
+                    "description": "Query all clip names on track",
+                    "query_params": "track_id",
+                    "response": "track_id, [name, ....]",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/get/clips/length",
+                    "mode": "get",
+                    "description": "Query all clip lengths on track",
+                    "query_params": "track_id",
+                    "response": "track_id, [length, ...]",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/get/clips/color",
+                    "mode": "get",
+                    "description": "Query all clip colors on track",
+                    "query_params": "track_id",
+                    "response": "track_id, [color, ...]",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/get/arrangement_clips/name",
+                    "mode": "get",
+                    "description": "Query all arrangement view clip names on track",
+                    "query_params": "track_id",
+                    "response": "track_id, [name, ....]",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/get/arrangement_clips/length",
+                    "mode": "get",
+                    "description": "Query all arrangement view clip lengths on track",
+                    "query_params": "track_id",
+                    "response": "track_id, [length, ...]",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/get/arrangement_clips/start_time",
+                    "mode": "get",
+                    "description": "Query all arrangement view clip times on track",
+                    "query_params": "track_id",
+                    "response": "track_id, [start_time, ...]",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/get/num_devices",
+                    "mode": "get",
+                    "description": "Query the number of devices on the track",
+                    "query_params": "track_id",
+                    "response": "track_id, num_devices",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/get/devices/name",
+                    "mode": "get",
+                    "description": "Query all device names on track",
+                    "query_params": "track_id",
+                    "response": "track_id, [name, ...]",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/get/devices/type",
+                    "mode": "get",
+                    "description": "Query all devices types on track",
+                    "query_params": "track_id",
+                    "response": "track_id, [type, ...]",
+                    "notes": []
+                },
+                {
+                    "address": "/live/track/get/devices/class_name",
+                    "mode": "get",
+                    "description": "Query all device class names on track",
+                    "query_params": "track_id",
+                    "response": "track_id, [class, ...]",
+                    "notes": []
+                }
+            ]
+        },
+        {
+            "api_name": "Clip Slot API",
+            "api_description": "A Clip Slot represents a container for a clip. It is used to create and delete clips, and query their existence. ",
+            "api_entries": [
+                {
+                    "address": "/live/clip_slot/fire",
+                    "mode": "get",
+                    "description": "Fire play/pause of the specified clip slot",
+                    "query_params": "track_index, clip_index",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip_slot/create_clip",
+                    "mode": "get",
+                    "description": "Create a clip in the slot",
+                    "query_params": "track_index, clip_index, length",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip_slot/delete_clip",
+                    "mode": "get",
+                    "description": "Delete the clip in the slot",
+                    "query_params": "track_index, clip_index",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip_slot/get/has_clip",
+                    "mode": "get",
+                    "description": "Query whether the slot has a clip",
+                    "query_params": "track_index, clip_index",
+                    "response": "track_index, clip_index, has_clip",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip_slot/get/has_stop_button",
+                    "mode": "get",
+                    "description": "Query whether the slot has a stop button",
+                    "query_params": "track_index, clip_index",
+                    "response": "track_index, clip_index, has_stop_button",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip_slot/set/has_stop_button",
+                    "mode": "set",
+                    "description": "Add or remove stop button (1=on, 0=off)",
+                    "query_params": "track_index, clip_index, has_stop_button",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip_slot/duplicate_clip_to",
+                    "mode": "get",
+                    "description": "Duplicate the clip to an empty target clip slot",
+                    "query_params": "track_index, clip_index, target_track_index, target_clip_index",
+                    "response": "",
+                    "notes": []
+                }
+            ]
+        },
+        {
+            "api_name": "Clip API",
+            "api_description": "Represents an audio or MIDI clip. Can be used to start/stop clips, and query/modify their notes, name, gain, pitch, color, playing state/position, etc. ",
+            "api_entries": [
+                {
+                    "address": "/live/clip/fire",
+                    "mode": "get",
+                    "description": "Start clip playback",
+                    "query_params": "track_id, clip_id",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/stop",
+                    "mode": "get",
+                    "description": "Stop clip playback",
+                    "query_params": "track_id, clip_id",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/duplicate_loop",
+                    "mode": "get",
+                    "description": "Duplicates clip loop",
+                    "query_params": "track_id, clip_id",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/get/notes",
+                    "mode": "get",
+                    "description": "Query the notes in a given clip, optionally including a start time/pitch and time/pitch span.",
+                    "query_params": "track_id, clip_id, [start_pitch, pitch_span, start_time, time_span]",
+                    "response": "track_id, clip_id, pitch, start_time, duration, velocity, mute, [pitch, start_time...]",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/add/notes",
+                    "mode": "get",
+                    "description": "Add new MIDI notes to a clip. pitch is MIDI note index, start_time and duration are beats in floats, velocity is MIDI velocity index, mute is true/false",
+                    "query_params": "track_id, clip_id, pitch, start_time, duration, velocity, mute, ...",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/remove/notes",
+                    "mode": "get",
+                    "description": "Remove notes from a clip in a range of pitches and times. If no ranges specified, all notes are removed. Note that ordering has changed as of 2023-11.",
+                    "query_params": "[start_pitch, pitch_span, start_time, time_span]",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/get/color",
+                    "mode": "get",
+                    "description": "Get clip color",
+                    "query_params": "track_id, clip_id",
+                    "response": "track_id, clip_id, color",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/set/color",
+                    "mode": "set",
+                    "description": "Set clip color",
+                    "query_params": "track_id, clip_id, color",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/get/color_index",
+                    "mode": "get",
+                    "description": "Get clip color index (0-69)",
+                    "query_params": "track_id, clip_id",
+                    "response": "track_id, clip_id, color_index",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/set/color_index",
+                    "mode": "set",
+                    "description": "Set clip color index (0-69)",
+                    "query_params": "track_id, clip_id, color_index",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/get/name",
+                    "mode": "get",
+                    "description": "Get clip name",
+                    "query_params": "track_id, clip_id",
+                    "response": "track_id, clip_id, name",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/set/name",
+                    "mode": "set",
+                    "description": "Set clip name",
+                    "query_params": "track_id, clip_id, name",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/get/gain",
+                    "mode": "get",
+                    "description": "Get clip gain",
+                    "query_params": "track_id, clip_id",
+                    "response": "track_id, clip_id, gain",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/set/gain",
+                    "mode": "set",
+                    "description": "Set clip gain",
+                    "query_params": "track_id, clip_id, gain",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/get/length",
+                    "mode": "get",
+                    "description": "Get clip length",
+                    "query_params": "track_id, clip_id",
+                    "response": "track_id, clip_id, length",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/get/sample_length",
+                    "mode": "get",
+                    "description": "Get clip sample length",
+                    "query_params": "track_id, clip_id",
+                    "response": "track_id, clip_id, sample_length",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/get/start_time",
+                    "mode": "get",
+                    "description": "Get clip start time",
+                    "query_params": "track_id, clip_id",
+                    "response": "track_id, clip_id, start_time",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/get/pitch_coarse",
+                    "mode": "get",
+                    "description": "Get clip coarse re-pitch",
+                    "query_params": "track_id, clip_id",
+                    "response": "track_id, clip_id, semitones",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/set/pitch_coarse",
+                    "mode": "set",
+                    "description": "Set clip coarse re-pitch",
+                    "query_params": "track_id, clip_id, semitones",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/get/pitch_fine",
+                    "mode": "get",
+                    "description": "Get clip fine re-pitch",
+                    "query_params": "track_id, clip_id",
+                    "response": "track_id, clip_id, cents",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/set/pitch_fine",
+                    "mode": "set",
+                    "description": "Set clip fine re-pitch",
+                    "query_params": "track_id, clip_id, cents",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/get/file_path",
+                    "mode": "get",
+                    "description": "Get clip file path",
+                    "query_params": "track_id, clip_id",
+                    "response": "track_id, clip_id, file_path",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/get/is_audio_clip",
+                    "mode": "get",
+                    "description": "Query whether clip is audio",
+                    "query_params": "track_id, clip_id",
+                    "response": "track_id, clip_id, is_audio_clip",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/get/is_midi_clip",
+                    "mode": "get",
+                    "description": "Query whether clip is MIDI",
+                    "query_params": "track_id, clip_id",
+                    "response": "track_id, clip_id, is_midi_clip",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/get/is_playing",
+                    "mode": "get",
+                    "description": "Query whether clip is playing",
+                    "query_params": "track_id, clip_id",
+                    "response": "track_id, clip_id, is_playing",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/get/is_overdubbing",
+                    "mode": "get",
+                    "description": "Query whether clip is overdubbing",
+                    "query_params": "track_id, clip_id",
+                    "response": "track_id, clip_id, is_overdubbing",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/get/is_recording",
+                    "mode": "get",
+                    "description": "Query whether clip is recording",
+                    "query_params": "track_id, clip_id",
+                    "response": "track_id, clip_id, is_recording",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/get/will_record_on_start",
+                    "mode": "get",
+                    "description": "Query whether clip will record on start",
+                    "query_params": "track_id, clip_id",
+                    "response": "track_id, clip_id, will_record_on_start",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/get/playing_position",
+                    "mode": "get",
+                    "description": "Get clip's playing position",
+                    "query_params": "track_id, clip_id",
+                    "response": "track_id, clip_id, playing_position",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/start_listen/playing_position",
+                    "mode": "observe",
+                    "description": "Start listening for clip's playing position. Replies are sent to /live/clip/get/playing_position, with args: track_id, clip_id, playing_position",
+                    "query_params": "track_id, clip_id",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/stop_listen/playing_position",
+                    "mode": "unobserve",
+                    "description": "Stop listening for clip's playing position.",
+                    "query_params": "track_id, clip_id",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/get/loop_start",
+                    "mode": "get",
+                    "description": "Get clip's loop start",
+                    "query_params": "track_id, clip_id",
+                    "response": "track_id, clip_id, loop_start",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/set/loop_start",
+                    "mode": "set",
+                    "description": "Set clip's loop start",
+                    "query_params": "track_id, clip_id, loop_start",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/get/loop_end",
+                    "mode": "get",
+                    "description": "Get clip's loop end",
+                    "query_params": "track_id, clip_id",
+                    "response": "track_id, clip_id, loop_end",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/set/loop_end",
+                    "mode": "set",
+                    "description": "Set clip's loop end",
+                    "query_params": "track_id, clip_id, loop_end",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/get/warping",
+                    "mode": "get",
+                    "description": "Get clip's warp mode",
+                    "query_params": "track_id, clip_id",
+                    "response": "track_id, clip_id, warping",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/set/warping",
+                    "mode": "set",
+                    "description": "Set clip's warp mode",
+                    "query_params": "track_id, clip_id, warping",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/get/launch_mode",
+                    "mode": "get",
+                    "description": "Get clip's launch mode (0=Trigger, 1=Gate, 2=Toggle, 3=Repeat)",
+                    "query_params": "track_id, clip_id",
+                    "response": "track_id, clip_id, launch_mode",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/set/launch_mode",
+                    "mode": "set",
+                    "description": "Set clip's launch mode (0=Trigger, 1=Gate, 2=Toggle, 3=Repeat)",
+                    "query_params": "track_id, clip_id, launch_mode",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/get/launch_quantization",
+                    "mode": "get",
+                    "description": "Get clip's launch Quantization Value (0=Global, 1=None, 2=8Bars, 3=4Bars, 4=2Bars, 5=1Bar, 6=1/2, 7=1/2T, 8=1/4, 9=1/4T, 10=1/8, 11=1/8T, 12=1/16, 13=1/16T, 14=1/32)",
+                    "query_params": "track_id, clip_id",
+                    "response": "track_id, clip_id, launch_quantization",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/set/launch_quantization",
+                    "mode": "set",
+                    "description": "Set clip's launch Quantization Value (0=Global, 1=None, 2=8Bars, 3=4Bars, 4=2Bars, 5=1Bar, 6=1/2, 7=1/2T, 8=1/4, 9=1/4T, 10=1/8, 11=1/8T, 12=1/16, 13=1/16T, 14=1/32)",
+                    "query_params": "track_id, clip_id, launch_quantization",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/get/ram_mode",
+                    "mode": "get",
+                    "description": "Get clip's Ram Mode (0=False, 1=True)",
+                    "query_params": "track_id, clip_id",
+                    "response": "track_id, clip_id, ram_mode",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/set/ram_mode",
+                    "mode": "set",
+                    "description": "Set clip's Ram Mode (0=False, 1=True)",
+                    "query_params": "track_id, clip_id, ram_mode",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/get/warp_mode",
+                    "mode": "get",
+                    "description": "Get clip's Warp Mode (0=Beats, 1=Tones, 2=Texture, 3=Re-Pitch, 4=Complex, 5=Invalid/Error, 6=Pro)",
+                    "query_params": "track_id, clip_id",
+                    "response": "track_id, clip_id, warp_mode",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/set/warp_mode",
+                    "mode": "set",
+                    "description": "Set clip's Warp Mode (0=Beats, 1=Tones, 2=Texture, 3=Re-Pitch, 4=Complex, 5=Invalid/Error, 6=Pro)",
+                    "query_params": "track_id, clip_id, warp_mode",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/get/has_groove",
+                    "mode": "get",
+                    "description": "Get clip Groove state (0=False, 1=True)",
+                    "query_params": "track_id, clip_id",
+                    "response": "track_id, clip_id, has_groove",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/get/legato",
+                    "mode": "get",
+                    "description": "Get clip's Legato state (0=False, 1=True)",
+                    "query_params": "track_id, clip_id",
+                    "response": "track_id, clip_id, legato",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/set/legato",
+                    "mode": "set",
+                    "description": "Set clip's Legato state (0=False, 1=True)",
+                    "query_params": "track_id, clip_id, legato",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/get/position",
+                    "mode": "get",
+                    "description": "Get clip's position (LoopStart)",
+                    "query_params": "track_id, clip_id",
+                    "response": "track_id, clip_id, position",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/set/position",
+                    "mode": "set",
+                    "description": "Set clip's position (LoopStart)",
+                    "query_params": "track_id, clip_id, position",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/get/muted",
+                    "mode": "get",
+                    "description": "Get clip's Muted state (0=False, 1=True)",
+                    "query_params": "track_id, clip_id",
+                    "response": "track_id, clip_id, muted",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/set/muted",
+                    "mode": "set",
+                    "description": "Set clip's Muted state (0=False, 1=True)",
+                    "query_params": "track_id, clip_id, muted",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/get/velocity_amount",
+                    "mode": "get",
+                    "description": "Get clip's Velocity Amount (0.0-1.0 aka 0% to 100%)",
+                    "query_params": "track_id, clip_id",
+                    "response": "track_id, clip_id, velocity_amount",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/set/velocity_amount",
+                    "mode": "set",
+                    "description": "Set clip's Velocity Amount (0.0-1.0 aka 0% to 100%)",
+                    "query_params": "track_id, clip_id, velocity_amount",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/get/start_marker",
+                    "mode": "get",
+                    "description": "Get clip's start marker",
+                    "query_params": "track_id, clip_id",
+                    "response": "track_id, clip_id, start_marker",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/set/start_marker",
+                    "mode": "set",
+                    "description": "Set clip's start marker, expressed in floating-point beats",
+                    "query_params": "track_id, clip_id, start_marker",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/get/end_marker",
+                    "mode": "get",
+                    "description": "Get clip's end marker",
+                    "query_params": "track_id, clip_id",
+                    "response": "track_id, clip_id, end_marker",
+                    "notes": []
+                },
+                {
+                    "address": "/live/clip/set/end_marker",
+                    "mode": "set",
+                    "description": "Set clip's end marker, expressed in floating-point beats",
+                    "query_params": "track_id, clip_id, end_marker",
+                    "response": "",
+                    "notes": []
+                }
+            ]
+        },
+        {
+            "api_name": "Scene API",
+            "api_description": "Represents a scene, used to trigger a row of clips simultaneously. A scene's name, color, tempo and time signature can all be set and queried. ",
+            "api_entries": [
+                {
+                    "address": "/live/scene/fire",
+                    "mode": "get",
+                    "description": "Trigger the given scene",
+                    "query_params": "scene_id",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/scene/fire_as_selected",
+                    "mode": "get",
+                    "description": "Trigger the scene and select the next scene",
+                    "query_params": "scene_id",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/scene/fire_selected",
+                    "mode": "get",
+                    "description": "Trigger the selected scene and select the next scene",
+                    "query_params": "",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/scene/get/color",
+                    "mode": "get",
+                    "description": "Query scene color",
+                    "query_params": "scene_id",
+                    "response": "scene_id, color",
+                    "notes": []
+                },
+                {
+                    "address": "/live/scene/get/color_index",
+                    "mode": "get",
+                    "description": "Query scene color index",
+                    "query_params": "scene_id",
+                    "response": "scene_id, color_index",
+                    "notes": []
+                },
+                {
+                    "address": "/live/scene/get/is_empty",
+                    "mode": "get",
+                    "description": "Query whether scene is empty",
+                    "query_params": "scene_id",
+                    "response": "scene_id, is_empty",
+                    "notes": []
+                },
+                {
+                    "address": "/live/scene/get/is_triggered",
+                    "mode": "get",
+                    "description": "Query whether scene is in triggered state",
+                    "query_params": "scene_id",
+                    "response": "scene_id, is_triggered",
+                    "notes": []
+                },
+                {
+                    "address": "/live/scene/get/name",
+                    "mode": "get",
+                    "description": "Query scene name",
+                    "query_params": "scene_id",
+                    "response": "scene_id, name",
+                    "notes": []
+                },
+                {
+                    "address": "/live/scene/get/tempo",
+                    "mode": "get",
+                    "description": "Query scene tempo",
+                    "query_params": "scene_id",
+                    "response": "scene_id, tempo",
+                    "notes": []
+                },
+                {
+                    "address": "/live/scene/get/tempo_enabled",
+                    "mode": "get",
+                    "description": "Query whether scene tempo is enabled",
+                    "query_params": "scene_id",
+                    "response": "scene_id, tempo_enabled",
+                    "notes": []
+                },
+                {
+                    "address": "/live/scene/get/time_signature_numerator",
+                    "mode": "get",
+                    "description": "Query scene time signature numerator",
+                    "query_params": "scene_id",
+                    "response": "scene_id, numerator",
+                    "notes": []
+                },
+                {
+                    "address": "/live/scene/get/time_signature_denominator",
+                    "mode": "get",
+                    "description": "Query scene time signature denominator",
+                    "query_params": "scene_id",
+                    "response": "scene_id, denominator",
+                    "notes": []
+                },
+                {
+                    "address": "/live/scene/get/time_signature_enabled",
+                    "mode": "get",
+                    "description": "Query whether scene time signature is enabled",
+                    "query_params": "scene_id",
+                    "response": "scene_id, enabled",
+                    "notes": []
+                },
+                {
+                    "address": "/live/scene/set/name",
+                    "mode": "set",
+                    "description": "Set scene name",
+                    "query_params": "scene_id, name",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/scene/set/color",
+                    "mode": "set",
+                    "description": "Set scene color",
+                    "query_params": "scene_id, color",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/scene/set/color_index",
+                    "mode": "set",
+                    "description": "Set scene color_index",
+                    "query_params": "scene_id, color_index",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/scene/set/tempo",
+                    "mode": "set",
+                    "description": "Set scene tempo",
+                    "query_params": "scene_id, tempo",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/scene/set/tempo_enabled",
+                    "mode": "set",
+                    "description": "Set whether scene tempo is enabled",
+                    "query_params": "scene_id, tempo_enabled",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/scene/set/time_signature_numerator",
+                    "mode": "set",
+                    "description": "Set scene time signature numerator",
+                    "query_params": "scene_id, numerator",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/scene/set/time_signature_denominator",
+                    "mode": "set",
+                    "description": "Set scene time signature denominator",
+                    "query_params": "scene_id, denominator",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/scene/set/time_signature_enabled",
+                    "mode": "set",
+                    "description": "Set whether scene time signature is enabled",
+                    "query_params": "scene_id, enabled",
+                    "response": "",
+                    "notes": []
+                }
+            ]
+        },
+        {
+            "api_name": "Device API",
+            "api_description": "Represents an instrument or effect. ",
+            "api_entries": [
+                {
+                    "address": "/live/device/get/name",
+                    "mode": "get",
+                    "description": "Get device name",
+                    "query_params": "track_id, device_id",
+                    "response": "track_id, device_id, name",
+                    "notes": []
+                },
+                {
+                    "address": "/live/device/get/class_name",
+                    "mode": "get",
+                    "description": "Get device class_name",
+                    "query_params": "track_id, device_id",
+                    "response": "track_id, device_id, class_name",
+                    "notes": []
+                },
+                {
+                    "address": "/live/device/get/type",
+                    "mode": "get",
+                    "description": "Get device type",
+                    "query_params": "track_id, device_id",
+                    "response": "track_id, device_id, type",
+                    "notes": []
+                },
+                {
+                    "address": "/live/device/get/num_parameters",
+                    "mode": "get",
+                    "description": "Get the number of parameters exposed by the device",
+                    "query_params": "track_id, device_id",
+                    "response": "track_id, device_id, num_parameters",
+                    "notes": []
+                },
+                {
+                    "address": "/live/device/get/parameters/name",
+                    "mode": "get",
+                    "description": "Get the list of parameter names exposed by the device",
+                    "query_params": "track_id, device_id",
+                    "response": "track_id, device_id, [name, ...]",
+                    "notes": []
+                },
+                {
+                    "address": "/live/device/get/parameters/value",
+                    "mode": "get",
+                    "description": "Get the device parameter values",
+                    "query_params": "track_id, device_id",
+                    "response": "track_id, device_id, [value, ...]",
+                    "notes": []
+                },
+                {
+                    "address": "/live/device/get/parameters/min",
+                    "mode": "get",
+                    "description": "Get the device parameter minimum values",
+                    "query_params": "track_id, device_id",
+                    "response": "track_id, device_id, [value, ...]",
+                    "notes": []
+                },
+                {
+                    "address": "/live/device/get/parameters/max",
+                    "mode": "get",
+                    "description": "Get the device parameter maximum values",
+                    "query_params": "track_id, device_id",
+                    "response": "track_id, device_id, [value, ...]",
+                    "notes": []
+                },
+                {
+                    "address": "/live/device/get/parameters/is_quantized",
+                    "mode": "get",
+                    "description": "Get the list of is_quantized settings (i.e., whether the parameter must be an int/bool)",
+                    "query_params": "track_id, device_id",
+                    "response": "track_id, device_id, [value, ...]",
+                    "notes": []
+                },
+                {
+                    "address": "/live/device/set/parameters/value",
+                    "mode": "set",
+                    "description": "Set the device parameter values",
+                    "query_params": "track_id, device_id, value, value ...",
+                    "response": "",
+                    "notes": []
+                },
+                {
+                    "address": "/live/device/get/parameter/value",
+                    "mode": "get",
+                    "description": "Get a device parameter value",
+                    "query_params": "track_id, device_id, parameter_id",
+                    "response": "track_id, device_id, parameter_id, value",
+                    "notes": []
+                },
+                {
+                    "address": "/live/device/get/parameter/value_string",
+                    "mode": "get",
+                    "description": "Get the device parameter value as a readable string ex: 2500 Hz",
+                    "query_params": "track_id, device_id, parameter_id",
+                    "response": "track_id, device_id, parameter_id, value",
+                    "notes": []
+                },
+                {
+                    "address": "/live/device/set/parameter/value",
+                    "mode": "set",
+                    "description": "Set a device parameter value",
+                    "query_params": "track_id, device_id, parameter_id, value",
+                    "response": "",
+                    "notes": []
+                }
+            ]
+        },
+        {
+            "api_name": "MidiMap API",
+            "api_description": "Can be used to create assignments between MIDI CC and Live parameters. ",
+            "api_entries": [
+                {
+                    "address": "/live/midimap/map_cc",
+                    "mode": "get",
+                    "description": "Create an assignment such that control change `cc` on channel `channel` will control the specified parameter.",
+                    "query_params": "track_id, device_id, param_id, channel, cc",
+                    "response": "",
+                    "notes": []
+                }
+            ]
+        }
+    ]
+}
