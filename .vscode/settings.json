@@ -3,5 +3,6 @@
     "editor.fontFamily": "'Cascadia Code', Consolas, 'Courier New', monospace ",
     "editor.fontLigatures": true,
     "python.languageServer": "Default",
-    "python.analysis.languageServerMode": "full"
+    "python.analysis.languageServerMode": "full",
+    "editor.mouseWheelZoom": true
 }

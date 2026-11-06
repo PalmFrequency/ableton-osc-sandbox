@@ -1,5 +1,30 @@
+# Locked data store
+#
+# While the metaclass ensures only one manager exists, the GlobalStateManager
+# ensures that the data inside that manager is safely accessed by multiple
+# threads.
+#
+#   The Dedicated Data Lock (self._data_lock): Notice that this class has its own
+#   entirely separate threading.Lock(). The metaclass lock is only used once to
+#   create the object; this data lock is used thousands of times to safely read
+#   and write the dictionary values (self._state).
+#
+#   Generic Type Hinting (TypeVar and cast): The get method requires an
+#   expected_type argument (e.g., expected_type=str). At runtime, Python ignores
+#   this, but during a mypy scan or when coding in an IDE like VS Code, the
+#   cast(V, val) explicitly tells the intellisense engine exactly what type of
+#   object is being returned, providing perfect autocomplete for your workers.
+#
+#   Atomic Operations (increment_metric): Instead of a worker thread calling get
+#   to find the total requests, adding 1, and calling set to save it (which
+#   creates a gap where another thread could overwrite the data), the
+#   increment_metric method locks the dictionary, adds 1, and unlocks it in a
+#   single, uninterrupted motion.
+
+import copy
 import threading
-from typing import Any, Dict, Optional, Type, TypeVar, cast
+from typing import Any, TypeVar, cast
+
 from singleton import ThreadSafeSingletonMeta
 
 # V represents the type of the value being extracted by the getter
@@ -12,24 +37,34 @@ class GlobalStateManager(metaclass=ThreadSafeSingletonMeta):
     def __init__(self) -> None:
         self._data_lock: threading.Lock = threading.Lock()
         
-        # Centralized system state
-        self._state: Dict[str, Any] = {
+        # [EXAMPLE] Centralized system state. Can also add properties of any type dynamically.
+        self._state: dict[str, Any] = {
             "environment": "production",
             "db_port": 3306,
             "metrics": {"total_requests": 0}
+            # ...
         }
 
-    def get(self, key: str, expected_type: Type[V], default: Optional[V] = None) -> Optional[V]:
+    def get(self, key: str, expected_type: type[V], default: V | None = None) -> V | None:
         """
         Safely fetches a typed global variable. 
-        Mypy uses expected_type to provide full IDE autocomplete on the return value.
+        Mypy uses expected_type to provide full IDE autocomplete on the return value,
+        and isinstance() guarantees runtime safety.
         """
         with self._data_lock:
-            val = self._state.get(key, default)
+            val: Any = self._state.get(key, default)
             if val is None:
                 return None
-            return cast(V, val)
-
+            
+            #  Strict runtime type enforcement
+            if not isinstance(val, expected_type):
+                raise TypeError(
+                    f"State mismatch for '{key}': Expected {expected_type.__name__}, "
+                    f"got {type(val).__name__}."
+                )
+                
+            return cast(V, copy.deepcopy(val))
+    
     def set(self, key: str, value: Any) -> None:
         """
         Safely updates a global variable.
@@ -37,54 +72,12 @@ class GlobalStateManager(metaclass=ThreadSafeSingletonMeta):
         with self._data_lock:
             self._state[key] = value
 
+    # [EXAMPLE] Atomic operation (metric increment)
     def increment_metric(self, metric_name: str) -> None:
         """
         An atomic, thread-safe increment operation for telemetry counters.
         """
         with self._data_lock:
-            metrics: Dict[str, int] = self._state["metrics"]
+            metrics: dict[str, int] = self._state["metrics"]
             if metric_name in metrics:
                 metrics[metric_name] += 1
-
-
-
-# # EXAMPLE CALL OF THE GLOBAL STATE MANAGER FROM A THIRD MAIN MODULE
-# python
-# import threading
-# import time
-# from state_manager import GlobalStateManager
-
-# def concurrent_worker(worker_id: int) -> None:
-#     # Resolves to the exact same global singleton instance
-#     state = GlobalStateManager()
-    
-#     # 1. Fetch values with strict IDE type autocomplete
-#     env = state.get("environment", expected_type=str)
-#     port = state.get("db_port", expected_type=int)
-    
-#     print(f"[Worker {worker_id}] Reading global config: Env={env}, Port={port}")
-    
-#     # 2. Mutate global telemetry across concurrent threads
-#     time.sleep(0.05)
-#     state.increment_metric("total_requests")
-
-
-# if __name__ == "__main__":
-#     # Access the manager to set the initial state
-#     app_state = GlobalStateManager()
-#     print("Application bootstrapping complete. Instantiating threads...\n")
-
-#     # Spawn independent threads acting simultaneously
-#     threads = []
-#     for i in range(1, 4):
-#         t = threading.Thread(target=concurrent_worker, args=(i,))
-#         threads.append(t)
-#         t.start()
-
-#     # Block main thread execution until all workers complete their loops
-#     for t in threads:
-#         t.join()
-
-#     # Verify final atomic updates safely
-#     final_metrics = app_state.get("metrics", expected_type=dict)
-#     print(f"\nAll operations finished. Final Global Metrics: {final_metrics}")
