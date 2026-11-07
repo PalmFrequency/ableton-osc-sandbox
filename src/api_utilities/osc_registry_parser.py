@@ -9,9 +9,11 @@ from urllib.request import Request, urlopen
 
 ##################################
 # REMINDERS
+# Implement thread-safe state management (one UDP/WebSocket instance to send the Ableton-OSC commands to limit chance of port collisions (11/7/2026)
+# Implement multi-threaded downloading (11/7/2026)
 # Handle edge cases (10/31/2026)
 # Investigate Structure Void paths (11/1/2026)
-# Run mypy to flag/catch issues before "releases" (10/31/2026)
+# Run mypy and ruff to flag/catch issues before "releases" (11/7/2026)
 # Create test cases (10/31/2026)
 # Create publicly accessible Marimo version of this utility (10/31/2026)
 ##################################
@@ -73,7 +75,7 @@ class APIEntryMode(Enum):
 # described throughout the API/regisry resource
 class NoteEntry:
     # Default constructor for NoteEntry
-    def __init__(self, note_type: NoteType, text: str, timestamp: datetime):
+    def __init__(self, note_type: NoteType, text: str, timestamp: datetime) -> None:
         self.note_type: NoteType = note_type
         self.text: str = text.strip()
         self.timestamp: datetime = timestamp
@@ -346,7 +348,7 @@ def extract_from_string(text_content: str) -> str:
 
 # Slices the Markdown file into API sections, dynamically calculates column maps,
 # and cleanly extracts structured data records.
-def parse_markdown_tables(md_content):
+def parse_markdown_tables(md_content) -> APIRegistry:
     # Create registry container and add the API source/metadata section
     api_registry:APIRegistry = APIRegistry(source_metadata = SourceMetadata())
     

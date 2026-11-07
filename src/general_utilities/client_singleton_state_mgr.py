@@ -87,6 +87,7 @@ if __name__ == "__main__":
     # [EXAMPLE] Working with concurrent threads for performance with ThreadPoolExecutor
     # and a max of 5 concurrent workers.
     # Reference: https://oneuptime.com/blog/post/2026-01-30-python-concurrent-futures-thread-pools/view
+    # Note examples showing how to use ThreadPoolExecutor for I/O intensive tasks such as Web downloads.
     with ThreadPoolExecutor(max_workers=5) as executor:
          # Submit three concurrent worker tasks and collect their results.
          results: list[int] = list(executor.map(concurrent_worker, range(1, 4)))
