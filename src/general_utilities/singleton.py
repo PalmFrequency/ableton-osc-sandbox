@@ -12,7 +12,7 @@
 #   heavy performance cost of acquiring a thread lock for the 99.9% of calls 
 #   that happen after initialization.
 #
-#   The Lock: with cls._lock: pauses all other threads trying to reach this 
+#   The Lock: with cls._locks: pauses all other threads trying to reach this 
 #   block. If three threads ask for the state manager at the exact same 
 #   microsecond during startup, one gets the lock, and the other two wait.
 #

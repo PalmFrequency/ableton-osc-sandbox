@@ -28,7 +28,7 @@ from typing import Any, TypeVar, cast
 from singleton import ThreadSafeSingletonMeta
 
 # V represents the type of the value being extracted by the getter
-V = TypeVar("V")
+V = TypeVar(name="V")
 
 class GlobalStateManager(metaclass=ThreadSafeSingletonMeta):
     """
@@ -37,19 +37,21 @@ class GlobalStateManager(metaclass=ThreadSafeSingletonMeta):
     def __init__(self) -> None:
         self._data_lock: threading.Lock = threading.Lock()
         
-        # [EXAMPLE] Centralized system state. Can also add properties of any type dynamically.
+        # [EXAMPLE] Initialized dict holding global thread-safe state. 
+        # Can also add properties of any type dynamically in a 
+        # thread-safe manner.
         self._state: dict[str, Any] = {
             "environment": "production",
             "db_port": 3306,
-            "metrics": {"total_requests": 0}
+            #"metrics": {"total_requests": 0} #Managed by increment_int_metric()
             # ...
         }
 
     def get(self, key: str, expected_type: type[V], default: V | None = None) -> V | None:
         """
-        Safely fetches a typed global variable. 
-        Mypy uses expected_type to provide full IDE autocomplete on the return value,
-        and isinstance() guarantees runtime safety.
+        Acquires an exclusive lock and safely fetches a typed global variable.
+        Mypy uses expected_type to provide full IDE autocomplete 
+        on the return value, and isinstance() guarantees runtime safety.
         """
         with self._data_lock:
             val: Any = self._state.get(key, default)
@@ -63,21 +65,35 @@ class GlobalStateManager(metaclass=ThreadSafeSingletonMeta):
                     f"got {type(val).__name__}."
                 )
                 
-            return cast(V, copy.deepcopy(val))
+            return cast(typ=V, val=copy.deepcopy(x=val))
     
     def set(self, key: str, value: Any) -> None:
         """
-        Safely updates a global variable.
+        Acquires an exclusive lock to prevent race conditions and 
+        safely updates a global variable.
         """
         with self._data_lock:
             self._state[key] = value
 
-    # [EXAMPLE] Atomic operation (metric increment)
-    def increment_metric(self, metric_name: str) -> None:
+    # [EXAMPLE] Atomic operation to increment an integer metric
+    # Thread safe because it locks the dict and performs the 
+    # operations in a single, uninterrupted motion. 
+    # If "metrics" does not exist, it is created. And if the 
+    # specific metric name does not exist, it is created and 
+    # initialized to 1.
+    def increment_int_metric(self, metric_name: str) -> None:
         """
-        An atomic, thread-safe increment operation for telemetry counters.
+        An atomic, increment operation for telemetry counters which
+        acquires an exclusive lock to prevent race conditions.
         """
         with self._data_lock:
+            # Initialize the metrics dictionary if it doesn't exist
+            if "metrics" not in self._state:
+                self._state["metrics"] = {}
+            # Get the metrics dictionary and increment the specified metric
             metrics: dict[str, int] = self._state["metrics"]
             if metric_name in metrics:
                 metrics[metric_name] += 1
+            # Initialize the metric if it doesn't exist
+            else:
+                metrics[metric_name] = 1
