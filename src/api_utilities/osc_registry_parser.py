@@ -5,7 +5,8 @@ from enum import Enum
 from pathlib import Path
 from typing import Any
 from urllib.error import HTTPError, URLError
-from urllib.request import Request, urlopen
+
+from multithreaded_io import MultithreadedIO, Payload
 
 ##################################
 # REMINDERS
@@ -311,18 +312,20 @@ def fetch_raw_readme(url:str = README_URL):
     if not url:
         raise ValueError("README_URL is empty or None.")
 
-    # Adding a User-Agent header is best practice; many servers block bare urllib requests
-    req = Request(url, headers = {"User-Agent" : "Python-urllib-script"})
+    io_worker = MultithreadedIO()
+    payload: Payload = io_worker.fetch_single(url = url)
+    if payload.data is None:
+        raise RuntimeError(f"Failed to fetch content from {url}.")
+    return payload.data
+    
+    # # With MultithreadedIO, we can fetch multiple URLs concurrently, but here we only need one.
+    # io_worker = MultithreadedIO()
+    # urls: list[str] = [url]
+    # ordered_payloads: list[tuple[str, Payload | None]] = io_worker.fetch_multi(urls = urls)
+    # if not ordered_payloads or ordered_payloads[0][1] is None or ordered_payloads[0][1].data is None:
+    #     raise RuntimeError(f"Failed to fetch content from {url}.")
+    # return ordered_payloads[0][1].data
 
-    try:
-        with urlopen(req, timeout = 10) as response:
-            return response.read().decode("utf-8")
-    except (HTTPError, URLError) as e:
-        print(f"[ERROR] Failed to access content at {url}:\n{e}", file=sys.stderr)
-        raise
-    except UnicodeDecodeError as e:
-        print(f"[ERROR] Failed to decode response as UTF-8:\n{e}", file=sys.stderr)
-        raise
 
 # ---------------------------------------
 
