@@ -97,3 +97,5 @@ class GlobalStateManager(metaclass=ThreadSafeSingletonMeta):
             # Initialize the metric if it doesn't exist
             else:
                 metrics[metric_name] = 1
+
+
