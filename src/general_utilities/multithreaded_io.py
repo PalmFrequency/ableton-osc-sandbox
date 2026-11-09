@@ -112,23 +112,24 @@ class MultithreadedIO:
                 return None
 
 
-# # =====================================================================
-# # Standalone Portability & Verification Execution ("main" thread)
-# # =====================================================================
-# if __name__ == "__main__":
-#     # Instantiate the module as an independent module chunk
-#     downloader = MultithreadedIO(
-#         url = "https://raw.githubusercontent.com/ideoforms/AbletonOSC/master/README.md", 
-#         max_workers = 3, 
-#         timeout = 5
-#     )
+# =====================================================================
+# Standalone Portability & Verification Execution ("main" thread)
+# =====================================================================
+# NOTE: Not called unless the module is run directly
+if __name__ == "__main__":
+    # Instantiate the module as an independent module chunk
+    downloader = MultithreadedIO(
+        url = "https://raw.githubusercontent.com/ideoforms/AbletonOSC/master/README.md", 
+        max_workers = 3, 
+        timeout = 5
+    )
     
-#     # Notice that the underlying internal mechanics and variables are completely
-#     # masked out of view from normal external caller interaction.
-#     data: str | None = downloader.run()
-#     if data:
-#         print("\r\nSuccessfully retrieved data payload:\r\n")
-#         print(data)
+    # Notice that the underlying internal mechanics and variables are completely
+    # masked out of view from normal external caller interaction.
+    data: str | None = downloader.run()
+    if data:
+        print("\r\nSuccessfully retrieved data payload:\r\n")
+        print(data)
 
 
 # Benefits from the refactored code above.

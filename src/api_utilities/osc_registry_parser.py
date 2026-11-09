@@ -16,6 +16,13 @@ from urllib.request import Request, urlopen
 # Run mypy and ruff to flag/catch issues before "releases" (11/7/2026)
 # Create test cases (10/31/2026)
 # Create publicly accessible Marimo version of this utility (10/31/2026)
+""" From 11/8/2026
+[ ] Retrofit Existing Modules: Audit your ableton-osc-sandbox repository and ensure any loose execution code in your older scripts is safely tucked behind an if __name__ == "__main__": guard.
+
+[ ] MyPy/Ruff Pass: Run your linters against the updated modules to ensure the standalone testing blocks meet your strict type-hinting standards.
+
+[ ] Next Component: Are we ready to route the payloads from batch_fetcher.py directly into the Phase 1 end-to-end tool call in ableton_mcp_server.py, or is there another utility module that needs refactoring first?
+"""
 ##################################
 
 
