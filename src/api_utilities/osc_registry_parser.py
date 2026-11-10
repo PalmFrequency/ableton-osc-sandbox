@@ -1,12 +1,13 @@
+import importlib
 import json
+import subprocess
 import sys
+import threading
 from datetime import datetime, timezone
 from enum import Enum
 from pathlib import Path
 from typing import Any
 from urllib.error import HTTPError, URLError
-
-from multithreaded_io import MultithreadedIO, Payload
 
 ##################################
 # REMINDERS
@@ -27,6 +28,10 @@ from multithreaded_io import MultithreadedIO, Payload
 ##################################
 
 
+
+
+
+
 # ------------------------------------------------------------------------------------
 # Globals
 # ------------------------------------------------------------------------------------
@@ -43,6 +48,9 @@ README_URL:str = "https://raw.githubusercontent.com/ideoforms/AbletonOSC/master/
 # If absolute path is used, parent diectory must already exist.
 # If output file already exists, it will be overwritten. 
 OUTPUT_JSON_PATH:str = r"compare_1_ableton_osc_registry_test.json"
+REQUIRED_DEPENDENCIES: dict[str, str] = {
+    "pythonosc": "python-osc"  # Adjusted key to map the real package folder name
+}
 
 # [OPTIONAL]
 SOURCE_REPOSITORY:str = "https://github.com/ideoforms/AbletonOSC"
@@ -50,6 +58,29 @@ SOURCE_AUTHOR:str = "https://github.com/ideoforms"
 SOURCE_LICENSE:str = "https://github.com/ideoforms/AbletonOSC?tab=MIT-1-ov-file"
 SOURCE_DESCRIPTION:str = "Control Ableton Live via Open Sound Control (OSC)"
 SOURCE_MIN_ABLETON_VERSION:str = "11.0"
+
+
+# Auto-manages runtime dependencies cleanly before loop execution
+def auto_provision_environment() -> None:
+    for module_name, package_name in REQUIRED_DEPENDENCIES.items():
+        try:
+            importlib.import_module(module_name)
+        except ImportError:
+            print(f"📦 Environment missing '{package_name}'. Auto-provisioning...")
+            try:
+                subprocess.check_call([sys.executable, "-m", "pip", "install", package_name])
+                print(f"✅ Successfully provisioned {package_name}")
+            except Exception as error:
+                print(f"❌ Structural setup failure for {package_name}: {error}")
+                sys.exit(1)
+
+
+# Ensure packages are locally available before proceeding to network loops
+auto_provision_environment()
+
+from pythonosc import dispatcher, osc_server, udp_client
+
+
 
 
 
@@ -131,7 +162,10 @@ SOURCE_NOTES: list[NoteEntry] = [
                                  timestamp_str = "2026-10-28"),
     NoteEntry.from_timestamp_str(note_type = NoteType.INFO, 
                                      text = "Source code to create this JSON structured data: https://github.com/PalmFrequency/ableton-osc-sandbox/blob/main/src/api_utilities/osc_registry_parser.py",
-                                     timestamp_str = "2026-10-30")
+                                     timestamp_str = "2026-10-30"),
+    NoteEntry.from_timestamp_str(note_type = NoteType.INFO, 
+                                         text = "AbletonOSC listens for OSC messages on port 11000 and sends responses on port 11001.",
+                                         timestamp_str = "2026-11-10")
 ]
 
 # ---------------------------------------
