@@ -1,5 +1,7 @@
+#from jedi.third_party.typeshed.stubs.six.six.moves.urllib import response
 import importlib
 import json
+import re
 import subprocess
 import sys
 import threading
@@ -8,6 +10,8 @@ from enum import Enum
 from pathlib import Path
 from typing import Any
 from urllib.error import HTTPError, URLError
+
+from multithreaded_io import MultithreadedIO, Payload
 
 ##################################
 # REMINDERS
@@ -109,6 +113,35 @@ class APIEntryMode(Enum):
 # Data Model with custom two-way contracts to enable JSON-based de-/serialization.
 # (serialize-to_dict(), deserialize-from_dict())
 # ------------------------------------------------------------------------------------
+
+
+
+class ArgElement:
+    def __init__(self, name: str, arg_type: type) -> None:
+        self.name: str = name.strip()
+        self.arg_type: type = arg_type
+
+    # SERIALIZE ArgElement instance into standard JSON types.
+    # Notes: Returns a dict object (enforced in Python as 
+    # a "suggestion"). Not decorated with @classmethod because 
+    # it requires access to instance properties.
+    def to_dict(self) -> dict:
+        return {
+            "name" : self.name.strip(),
+            "arg_type" : self.arg_type.__name__
+        }
+
+    # DESERIALIZE dict instance into native ArgElement object
+    # instance and properties. Notes: Returns an ArgElement object 
+    # (enforced in Python as a "suggestion"). Decorated with @classmethod because
+    # it accesses the class definition
+    @classmethod
+    def from_dict(cls, data: dict) -> "ArgElement":
+        return cls(
+            name = data["name"],
+            arg_type = type(data["arg_type"])
+        )
+
 
 # Class definitions for structured data representation of notes
 # described throughout the API/regisry resource
@@ -228,12 +261,12 @@ class SourceMetadata:
 # Class describes each individual Ableton-OSC API methods
 # under each API section as described by the parsed source documentation
 class APIEntry:
-    def __init__(self, address: str, mode: str, description: str, query_params: str, response: str, notes:list[NoteEntry]):
+    def __init__(self, address: str, mode: str, description: str, query_params: list[ArgElement], response: list[ArgElement], notes:list[NoteEntry]):
         self.address: str = address.strip()
         self.mode: str = mode.strip()
         self.description: str = description.strip()
-        self.query_params: str = query_params.strip()
-        self.response: str = response.strip()
+        self.query_params: list[ArgElement] = query_params
+        self.response: list[ArgElement] = response
         self.notes: list[NoteEntry] = notes
     
     # SERIALIZE APIEntry instance into standard JSON types.
@@ -245,8 +278,8 @@ class APIEntry:
             "address": self.address.strip(),
             "mode": self.mode.strip(),
             "description": self.description.strip(),
-            "query_params": self.query_params.strip(),
-            "response": self.response.strip(),
+            "query_params": [arg.to_dict() for arg in self.query_params],
+            "response": [arg.to_dict() for arg in self.response],
             "notes": [note.to_dict() for note in self.notes]
         }
 
@@ -260,8 +293,8 @@ class APIEntry:
             address = data["address"],
             mode = data["mode"],
             description = data["description"],
-            query_params = data["query_params"],
-            response = data["response"],
+            query_params = [ArgElement.from_dict(data = d) for d in data["query_params"]],
+            response = [ArgElement.from_dict(data = d) for d in data["response"]],
             notes = [NoteEntry.from_dict(data = d) for d in data.get("notes", [])]
         )
 
@@ -351,14 +384,6 @@ def fetch_raw_readme(url:str = README_URL):
     if payload.data is None:
         raise RuntimeError(f"Failed to fetch content from {url}.")
     return payload.data
-    
-    # # With MultithreadedIO, we can fetch multiple URLs concurrently, but here we only need one.
-    # io_worker = MultithreadedIO()
-    # urls: list[str] = [url]
-    # ordered_payloads: list[tuple[str, Payload | None]] = io_worker.fetch_multi(urls = urls)
-    # if not ordered_payloads or ordered_payloads[0][1] is None or ordered_payloads[0][1].data is None:
-    #     raise RuntimeError(f"Failed to fetch content from {url}.")
-    # return ordered_payloads[0][1].data
 
 
 # ---------------------------------------
@@ -421,6 +446,22 @@ def parse_markdown_tables(md_content) -> APIRegistry:
             # Access last (current) API Section and associate the address/path info (the method)
             current_api_section: APISection = api_sections[-1]
             cols: list[str] = [c.strip() for c in line_str.strip("|").split(sep = "|")]
+
+            # Convert the query parameters and response to strings to a list of ArgElement objects
+            query_params_str: str = cols[1:2][0] if len(cols[1:2]) > 0 else "" # Assuming query params are in the second column
+            # Convert to a list of str
+            query_params_list: list[str] = list(map(str.strip, query_params_str.split(sep = ","))) if query_params_str else []
+            # Convert to a list of ArgElement objects
+            query_params: list[ArgElement] = []
+            for query_param in query_params_list:
+                query_params.append(ArgElement(name = query_param, arg_type = str))
+
+            response_str: str = cols[2:3][0] if len(cols[2:3]) > 0 else "" # Assuming response is in the third column
+            response_list: list[str] = list(map(str.strip, response_str.split(sep = ","))) if response_str else []
+            response: list[ArgElement] = []
+            for response_item in response_list:
+                response.append(ArgElement(name = response_item, arg_type = str))
+
             current_api_section.api_entries.append(APIEntry(
                 address = cols[0],
                 mode = "get" if "/get/" in cols[0] 
@@ -430,10 +471,8 @@ def parse_markdown_tables(md_content) -> APIRegistry:
                     else "get",
                 description = cols[3] if len(cols) > 3 
                     else "",
-                query_params = cols[1:2][0] if len(cols[1:2]) > 0 
-                    else "",  # Assuming query params are in the second column
-                response = cols[2:3][0] if len(cols[2:3]) > 0 
-                    else "",      # Assuming response is in the third column
+                query_params = query_params,
+                response = response,      
                 notes = [] # For possible future use
             ))
 
