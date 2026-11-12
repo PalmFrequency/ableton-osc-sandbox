@@ -25,7 +25,7 @@ import copy
 import threading
 from typing import Any, TypeVar, cast
 
-from singleton import ThreadSafeSingletonMeta
+from src.api_utilities.singleton import ThreadSafeSingletonMeta
 
 # V represents the type of the value being extracted by the getter
 V = TypeVar(name="V")

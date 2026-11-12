@@ -5,9 +5,12 @@ import threading
 import time
 from typing import Any
 
-from .osc_request_tracker import (
-    OSCRequestTracker, PendingRequest,  # instructs ty to look in current folder
-)
+import osc_request_tracker
+
+# from .osc_request_tracker import (
+#     OSCRequestTracker,  # instructs ty to look in current folder
+#     PendingRequest,
+# )
 
 # TODO: Place globals in a Singleton; Implement subscribe/listen pattern with AbletonOSC; 
 # Understand all patterns (i.e. all request and response arg types X values X order X number)
@@ -15,12 +18,17 @@ from .osc_request_tracker import (
 
 # Summary of Benefits
 #
-# • Zero ID Reuse: itertools.count(1) ensures every request gets a lifetime-unique integer ID (1, 2, 3...), preventing cross-talk between timed-out and active calls.
-# • No Global Payload Collisions: Storing payload directly on the PendingRequest instance means concurrent threads never overwrite each other's return values.
-# • Leak-Free: The finally block ensures both _requests and _routing_queues purge empty entries immediately after completion or timeout.
-# • Generic Foundation: Because query_osc_sync takes address, send_args, and match_args, it directly supports your # TODO goal of building generic handlers for all AbletonOSC argument patterns.
+# • Zero ID Reuse: itertools.count(1) ensures every request gets a lifetime-unique integer 
+# ID (1, 2, 3...), preventing cross-talk between timed-out and active calls.
+# • No Global Payload Collisions: Storing payload directly on the PendingRequest instance 
+# means concurrent threads never overwrite each other's return values.
+# • Leak-Free: The finally block ensures both _requests and _routing_queues purge empty 
+# entries immediately after completion or timeout.
+# • Generic Foundation: Because query_osc_sync takes address, send_args, and match_args, 
+# it directly supports your # TODO goal of building generic handlers for all AbletonOSC argument patterns.
 #
-# Would you like to expand this OSCRequestTracker into the Singleton mentioned in your TODO comments, or adapt it to support AbletonOSC's /start_listen subscription pattern next?
+# Would you like to expand this OSCRequestTracker into the Singleton mentioned in your TODO 
+# comments, or adapt it to support AbletonOSC's /start_listen subscription pattern next?
 
 
 # =====================================================================
@@ -56,23 +64,8 @@ ABLETON_PORT = 11000
 LOCAL_PORT = 11001
 
 
-tracker = OSCRequestTracker()
+tracker = osc_request_tracker.OSCRequestTracker()
 
-def volume_handler(address: str, *args: Any) -> None:
-    if len(args) >= 2:
-        track_idx, volume_level = args[0], args[1]
-        route_key = (address, track_idx)
-        matched_uid = tracker.resolve(route_key, payload=volume_level)
-        print(f"[Callback | Req #{matched_uid}] Track {track_idx + 1} Volume: {volume_level:.2f}")
-
-def test_handler(address: str, *args: Any) -> None:
-    status = args[0] if args else None
-    route_key = (address,)
-    matched_uid = tracker.resolve(route_key, payload=status)
-    print(f"[Callback | Req #{matched_uid}] Test response: {status}")
-
-def default_handler(address, *args) -> None:
-    print(f"[Unmapped Address] Received payload on: {address} -> {args}")
 
 
 # =====================================================================
@@ -91,6 +84,22 @@ def default_handler(address, *args) -> None:
 #     print(f"[Response] ableton-osc Log Level: {log_level}")
 #     response_event.set()  # 🟢 Wake up the main thread immediately
 
+def volume_handler(address: str, *args: Any) -> None:
+    if len(args) >= 2:
+        track_idx: int = args[0]
+        volume_level: float = args[1]
+        route_key: tuple[str, Any] = (address, track_idx)
+        matched_uid: int | None = tracker.resolve(route_key, payload = volume_level)
+        print(f"[Callback | Req #{matched_uid}] Track {track_idx + 1} Volume: {volume_level:.2f}")
+
+def test_handler(address: str, *args: Any) -> None:
+    status: Any | None = args[0] if args else None
+    route_key: tuple[str, ...] = (address,)
+    matched_uid: int | None = tracker.resolve(route_key, payload = status)
+    print(f"[Callback | Req #{matched_uid}] Test response: {status}")
+
+def default_handler(address: str, *args: Any) -> None:
+    print(f"[Unmapped Address] Received payload on: {address} -> {args}")
 
 
 # =====================================================================
@@ -107,11 +116,13 @@ server_thread: threading.Thread = threading.Thread(target = server.serve_forever
 server_thread.start()
 print(f"\nListening for Ableton replies on port {LOCAL_PORT}...\n")
 
+
 # =====================================================================
 #  Initialize client to send commands to Ableton.
 #  Fire valid requests with Ableton running
 # =====================================================================
 osc_client = udp_client.SimpleUDPClient(address = ABLETON_IP, port = ABLETON_PORT)
+
 
 # =====================================================================
 # Synchronous Execution Wrapper Pattern
@@ -144,16 +155,32 @@ def query_osc_sync(
     arguments. (Note: ... only works with a single type before it—you cannot write 
     tuple[str, Any, ...]).
     """
+    # A route key combines the OSC address with its identifying arguments.
     route_key: tuple[str, *tuple[Any, ...]] = (address, *match_args)
+    # Lifecycle Example (1-6)
+    # 1. Sender Thread calls req = tracker.register(('/get/status',)) to get 
+    # a ticket.
     req: PendingRequest = tracker.register(route_key)
 
     try:
-        osc_client.send_message(address=address, value=send_args)
-        success: bool = req.event.wait(timeout=timeout)
+        # 2. Sender Thread sends the actual OSC network message.
+        osc_client.send_message(address = address, value = send_args)
+        # 3. Sender Thread calls req.event.wait(timeout=2.0). It freezes here,
+        # using zero CPU, waiting for the green light. 
+        # (i.e. event.wait() -> ***RED LIGHT***)
+        success: bool = req.event.wait(timeout = timeout)
+        # 4. Listener Thread (running in the background) receives an OSC message
+        # from the network on /get/status with data "OK".
+        # 5. Listener Thread calls tracker.resolve(('/get/status',), "OK"). This
+        # puts "OK" into req.payload and flips req.event to green.
+        # (i.e. event.set() -> ***GREEN LIGHT***)
+        # 6. Sender Thread immediately wakes up, reads req.payload ("OK"), and
+        # calls tracker.cleanup(...) to tidy up memory.
         return req.uid, (req.payload if success else None)
     finally:
         # Always runs—prevents memory leaks on timeout or exception
         tracker.cleanup(route_key, req.uid)
+
 
 # =====================================================================
 # Main Sequence Operations Execution

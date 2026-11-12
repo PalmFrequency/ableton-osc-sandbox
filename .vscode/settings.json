@@ -1,5 +1,5 @@
 {
-    "workbench.colorTheme": "Light+",
+    "workbench.colorTheme": "Dark+",
     "editor.fontFamily": "'Cascadia Code', Consolas, 'Courier New', monospace ",
     "editor.fontLigatures": true,
     "python.languageServer": "Default",

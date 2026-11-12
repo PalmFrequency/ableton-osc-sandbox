@@ -1,0 +1,88 @@
+{
+  "version": "1",
+  "metadata": {
+    "marimo_version": "0.25.2",
+    "script_metadata_hash": null
+  },
+  "cells": [
+    {
+      "id": "Hbol",
+      "code_hash": "99974cd78253e53f39e9c7407427e564",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stdout",
+          "text": "Python 3.13.16 (tags/v3.13.16:cbc944f, Sep 30 2026, 19:17:50) [MSC v.1944 64 bit (AMD64)] on win32\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "MJUe",
+      "code_hash": "871b321b55e528f7f12da1f5c815c787",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "vblA",
+      "code_hash": "970cb5692a336854e235a690ea02572e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<pre class='text-xs'>&lt;Task pending name=&#x27;Task-5624&#x27; coro=&lt;send_osc_update() running at C:\\Users\\dev\\AppData\\Local\\Temp\\marimo_20620\\__marimo__cell_vblA_.py:9&gt;&gt;</pre>"
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stdout",
+          "text": "{'/live/master/volume': 1.0, '/live/track/0/pan': -1.0}\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "bkHC",
+      "code_hash": "6dac0a52bb8c459d379e4b8d54f09321",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<div style='display: flex;flex: 1;flex-direction: column;justify-content: flex-start;align-items: normal;flex-wrap: nowrap;gap: 0.5rem'><span class=\"markdown prose dark:prose-invert contents\"><h1 id=\"palmfrequency\">\ud83c\udf34 PalmFrequency</h1>\n<h2 id=\"ableton-live-remote-canvas-control-phase-1\">Ableton Live Remote Canvas Control (Phase 1)</h2>\n<span class=\"paragraph\">An open-source, non-commercial playground designed to share music \nproduction workflows with future learners and collaborative creators.</span></span><span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"live-performance-strips\">Live Performance Strips</h3>\n<span class=\"paragraph\"><marimo-ui-element object-id='Hbol-0' random-id='16b9de7b-0114-5549-7ea1-deb941e4257f'><marimo-slider data-initial-value='0.5' data-label='&quot;&#92;u003cspan class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&#92;u003e&#92;u003cspan class=&#92;&quot;paragraph&#92;&quot;&#92;u003e\ud83c\udf9b\ufe0f Master Track Volume&#92;u003c/span&#92;u003e&#92;u003c/span&#92;u003e&quot;' data-start='0.0' data-stop='1.0' data-step='0.01' data-steps='[]' data-debounce='false' data-disabled='false' data-orientation='&quot;horizontal&quot;' data-show-value='false' data-include-input='false' data-full-width='false'></marimo-slider></marimo-ui-element></span>\n<span class=\"paragraph\"><marimo-ui-element object-id='Hbol-1' random-id='97d43dc7-8d98-ae9b-335b-4ef805575e0a'><marimo-slider data-initial-value='0.0' data-label='&quot;&#92;u003cspan class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&#92;u003e&#92;u003cspan class=&#92;&quot;paragraph&#92;&quot;&#92;u003e\ud83c\udf9a\ufe0f Track 1 Panning (L/R)&#92;u003c/span&#92;u003e&#92;u003c/span&#92;u003e&quot;' data-start='-1.0' data-stop='1.0' data-step='0.02' data-steps='[]' data-debounce='false' data-disabled='false' data-orientation='&quot;horizontal&quot;' data-show-value='false' data-include-input='false' data-full-width='false'></marimo-slider></marimo-ui-element></span></span></div>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "lEQa",
+      "code_hash": null,
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    }
+  ]
+}

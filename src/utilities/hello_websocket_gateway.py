@@ -37,15 +37,15 @@ from pythonosc.udp_client import SimpleUDPClient  # Fixed namespace reference pa
 
 # Infrastructure routing constraints
 ABLETON_IP = "127.0.0.1"
-ABLETON_PORT = 9000
+ABLETON_PORT = 11000 #9000
 WS_HOST = "127.0.0.1"
 WS_PORT = 8765
 
 # Instantiated outbound UDP transmission pipeline
-osc_client = SimpleUDPClient(ABLETON_IP, ABLETON_PORT)
+osc_client = SimpleUDPClient(address = ABLETON_IP, port = ABLETON_PORT)
 
 
-async def handle_marimo_transaction(websocket):
+async def handle_marimo_transaction(websocket) -> None:
     print("📡 Successful incoming connection recognized from UI interface!")
     try:
         # Listen continuously for incoming messages from the browser
@@ -53,7 +53,7 @@ async def handle_marimo_transaction(websocket):
             try:
                 # Parse the incoming JSON data
                 payload = json.loads(frame_message)
-                address_path = payload.get("address", "/live/master/volume")
+                address_path = payload.get("address", "/live/track/get/volume")
                 parameter_value = float(payload.get("value", 0.5))
 
                 print(f"🎛️ Routing downstream: {address_path} ➔ {parameter_value}")
