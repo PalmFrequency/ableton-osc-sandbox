@@ -160,7 +160,7 @@ def query_osc_sync(
     # Lifecycle Example (1-6)
     # 1. Sender Thread calls req = tracker.register(('/get/status',)) to get 
     # a ticket.
-    req: PendingRequest = tracker.register(route_key)
+    req: osc_request_tracker.PendingRequest = tracker.register(route_key)
 
     try:
         # 2. Sender Thread sends the actual OSC network message.
